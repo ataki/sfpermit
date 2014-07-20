@@ -1,0 +1,291 @@
+/* Map Container */
+
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+/* Mixins */
+
+.map-control-inner-padding(@innerPadding) {
+	padding: 0 @innerPadding;
+}
+
+/* Leaflet overrides */
+
+.leaflet-container {
+	font-family: @default-font-family;	
+	font-size: @default-font-size;
+}
+
+.leaflet-bar {
+	border-radius: 0px;
+
+	.leaflet-control-zoom-in, 
+	.leaflet-control-zoom-out {
+		.primary-colors();
+	}
+}
+
+.leaflet-bar a:first-child {
+	border-top-left-radius: 0px;
+	border-top-right-radius: 0px;	
+}
+
+.leaflet-bar a:last-child {
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0px;
+}
+
+.leaflet-popup-content-wrapper {
+	border-radius: 1px !important;
+}
+
+/* Controls */
+
+.indicator {
+	&-success { background-color: @accent-green; }
+	&-fail { background-color: @accent-red; }
+	&-info { background-color: @accent-yellow; }
+	&-neutral { background-color: @grayLight; }
+}
+
+.map-control {
+	// relative to root map div
+	position: absolute; 
+	a { cursor: pointer; }
+
+	@title-font-size: @default-font-size * 1.2;
+	@subtitle-font-size: @default-font-size * 1.1;
+
+	// common child stylings for a map control component
+	h1 {
+		font-size: @title-font-size;
+		margin: @title-font-size/2 0 0 0;
+		line-height: 2 * @title-font-size;
+	}
+	h4 {
+		font-size: @subtitle-font-size;
+		margin: @subtitle-font-size/2 0 0 0;
+	}
+	h4, .aside {
+		color: @grayLight;
+	}
+	h5 {
+		line-height: 12px;
+		font-size: 12px;
+		color: @grayLight;
+		margin: 0;
+	}
+
+	.indicator {
+		width: 6px;
+		height: 2 * @default-font-size;
+		padding: 0;
+		margin: 0 6px 0 0;
+	}
+
+	.btn-toolbar {
+		margin-left: 50%;
+		text-align: right;
+		font-size: @default-font-size;
+		color: @accent-blue;
+		vertical-align: middle;
+		i { 
+			margin: 0 10px;
+			padding-right: 20px;
+			cursor: pointer;
+			&:not(:last-child) {
+				border-right: 1px solid lighten(@grayLight, 5%);
+			}
+		}
+	}
+}
+
+.map-control-inner-padding {
+	padding: 0 20px;
+}
+
+/*#master-control-view {
+	.secondary-colors();	
+
+	@x: 0px;
+	@y: 50px;
+	@iconPadding: 10px;
+	@numIcons: 5;
+
+	// coordinates in map container
+	left: @x;
+	top: @y;
+
+	// essential
+	text-align: center;
+
+	// children
+	.master-control-tile {
+		padding: 1.25*@iconPadding @iconPadding/2 @iconPadding/2;
+		width: @width;
+		height: @height / @numIcons;
+		cursor: pointer;
+
+		.fa { font-size: 20px; }
+
+		&-name {
+			clear: both;
+			display: block;
+			margin-top: 7.5px;
+			font-size: 12px;
+		}
+
+		// &:not(:last-child) {
+		//	border-bottom: 1px solid darken(@secondary-bg-color, 5%);
+		// }
+		&.active {
+			color: #FFFFFF !important;
+		}
+	}
+}*/
+
+#search-control-view {
+	@x: 0px;
+	@y: 0px;
+	@height: 40px;
+    @font-size: 12px;
+    @background: @blueDark;
+	@edgePadding: 10px;
+
+	// coordinates in map container
+	left: @x;
+	top: @y;
+
+    position: fixed;
+    font-size: @font-size;
+
+    width: 100%;
+	height: @height;
+    background: @background;
+	padding: 0 @edgePadding;
+
+    // override
+    margin: 0;
+
+	input {
+		height: @height;
+		border: 0;
+		display: block;
+		font-size: @default-font-size;
+		font-family: "Open Sans", sans-serif;
+		outline: none;
+	}
+}
+
+.brand-bar {
+    @margin-top: 30px;
+    @height: 45px;
+
+    margin-top: @margin-top;
+    height: @height;
+
+    ul {
+        background: #FFF;
+        li { 
+            width: 60px;
+            text-align: center;
+            vertical-align: middle;
+            display: inline-block; 
+            border-right: 1px solid #FFF;
+        }
+        .logo { font-variant: small-caps; }
+    }
+}
+
+#help-control-view {
+	.tertiary-colors();
+
+	@x: 65px;
+	@y: 50px;		
+	@width: 450px;
+	@containerMargin: 10px;
+
+	left: @x;
+	top: @y;
+	width: @width;
+	margin-left: 2 * @containerMargin;
+}
+
+#leads-control-view {
+	.tertiary-colors();
+
+	@x: 65px;
+	@y: 50px;
+	@width: 450px;
+	@containerMargin: 10px;
+
+	left: @x;
+	top: @y;
+	width: @width;
+	margin-left: 2 * @containerMargin;
+
+	ul.leads {
+		overflow: scroll;
+		max-height: 500px;
+	}
+
+	ul.lead {
+		cursor: pointer;
+		margin-bottom: 10px;
+
+		li { 
+			display: inline-block; 
+			vertical-align: middle;
+			line-height: 2 * @default-font-size;
+		}
+		.address { font-weight: 300; color: #333333; }
+		.stage { opacity: 0.5; }
+
+		&:hover {
+			background-color: @grayLighter;	
+		}
+
+		&:not(:last-child) {
+			border-bottom: 1px solid @grayLighter;
+		}
+	}
+}
+
+#layers-control-view {
+	.tertiary-colors();
+
+	@x: 65px;
+	@y: 50px;
+	@width: 450px;
+	@containerMargin: 10px;
+
+	left: @x;
+	top: @y;
+	width: @width;
+	margin-left: 2 * @containerMargin;
+}
+
+/* Generic Classes */
+
+.control-generic-list {
+	cursor: pointer;
+	margin-bottom: 10px;
+
+	overflow: scroll;
+	max-height: 500px;
+
+	li { 
+		vertical-align: middle;
+		line-height: 2 * @default-font-size;
+		padding-top: 7px;
+		padding-bottom: 7px;
+		&:hover {
+			background-color: @grayLighter;	
+		}
+		&:not(:last-child) {
+			border-bottom: 1px solid @grayLighter;
+		}
+	}
+}

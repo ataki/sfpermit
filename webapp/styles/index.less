@@ -1,0 +1,138 @@
+// ----------------------
+// Variables 
+
+@red: #F97D75;
+@primary-bg-color: rgb(60, 78, 90);
+@primary-color: #FFFFFF;
+
+@secondary-bg-color: #363C46;
+@secondary-color: #777;
+
+@tertiary-bg-color: #FFFFFF;
+@tertiary-color: #2E3641;
+
+@blue: #4d90fe;
+@blueDark: rgb(60, 78, 90);
+
+@black:                 #000;
+@grayDarker:            #222;
+@grayDark:              #333;
+@gray:                  #555;
+@grayLight:             #999;
+@grayLighter:           #eee;
+@white:                 #fff;
+
+// Accent colors
+// -------------------------
+@accent-blue:                  #049cdb;
+@accent-blueDark:              #0064cd;
+@accent-green:                 #46a546;
+// @accent-red:                   #9d261d;
+@accent-yellow:                #ffc40d;
+@accent-purple:                #7a43b6;
+@accent-red:             			 #E94D3D;
+
+@default-font-family: "Open Sans", sans-serif;
+@default-font-size: 14px;
+
+// ----------------------
+// Mixins
+
+.primary-colors() {
+	background-color: @primary-bg-color;
+	color: @primary-color;
+}
+
+.secondary-colors() {
+	background-color: @secondary-bg-color;
+	color: @secondary-color;	
+}
+
+.tertiary-colors() {
+	background-color: @tertiary-bg-color;
+	color: @tertiary-color;
+}
+
+.user-select(@sel) {
+	-webkit-touch-callout: @sel;
+	-webkit-user-select: @sel;
+	-khtml-user-select: @sel;
+	-moz-user-select: @sel;
+	-ms-user-select: @sel;
+	user-select: @sel;
+}
+
+.box-shadow(@shadow) {
+	-webkit-box-shadow: @shadow;
+	-moz-box-shadow: @shadow;
+	box-shadow: @shadow;
+}
+
+@import "mixins/button.less";
+
+// ----------------------
+// Default Styles
+
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  font-family: @default-font-family;
+	font-size: @default-font-size;	
+}
+
+ul {
+	list-style: none;
+	padding: 0;
+}
+
+hr {
+	opacity: 0.3;
+	margin-top: 0;
+}
+
+button {
+  display: inline-block;
+  // margin-bottom: 0; // For input.btn
+  font-weight: @btn-font-weight;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  background-image: none; // Reset unusual Firefox-on-Android default style; see https://github.com/necolas/normalize.css/issues/214
+  border: 1px solid transparent;
+  white-space: nowrap;
+  .button-size(@padding-base-vertical; @padding-base-horizontal; @margin-base-vertical; 0; @font-size-base; @line-height-base; @border-radius-base);
+  .user-select(none);
+}
+
+button.btn-primary {
+	@color: @primary-color; 
+	@bg: @primary-bg-color;
+	@border: @color;
+	.button-variant(@color, @bg, @border);
+}
+
+button.btn-secondary {
+	@color: @secondary-color;
+	@bg: @secondary-bg-color;
+	@border: @color;
+	.button-variant(@color, @bg, @border);
+}
+
+button-btn-tertiary {
+	@color: @tertiary-color;
+	@bg: @tertiary-bg-color;
+	@border: @color;
+	.button-variant(@color, @bg, @border);
+}
+
+.inline-heading {
+	display: inline-block;	
+}
+
+// ------------------------
+// Include modules after utils have been defined
+
+@import "./map.less";
+@import "./utils.less";
+@import "./font-awesome/font-awesome.less";
