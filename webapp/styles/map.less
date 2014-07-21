@@ -16,6 +16,11 @@
 .leaflet-container {
 	font-family: @default-font-family;	
 	font-size: @default-font-size;
+
+	a {
+		color: inherit;	
+		text-decoration: none;
+	}
 }
 
 .leaflet-bar {
@@ -336,25 +341,60 @@
 	margin-left: 2 * @containerMargin;
 }
 
-/* Generic Classes */
+/* Section::List View */
 
-.control-generic-list {
-	cursor: pointer;
-	margin-bottom: 10px;
+#list-view {
+	@li-size: 50px;
+	@default-max-li: 10;
 
-	overflow: scroll;
-	max-height: 500px;
+	position: fixed;
+	top: 60px;
+	left: 32px;
+
+	margin: 0;
+
+	.head {
+		height: 24px;
+		padding: 24px 0;
+		border-bottom: 1px solid #efefef;
+	}
+
+	h1, h2, h3, h4, h5, h6 {
+		padding: 0 10px;
+		margin: 0;
+	}
+
+	// option and padding to be controlled
+	// by other properties
+
+	ul {
+		overflow: scroll;
+		margin: 0;
+		max-height: @li-size * @default-max-li;
+	}
 
 	li { 
+		text-decoration: none;
+		color: #333;
 		vertical-align: middle;
-		line-height: 2 * @default-font-size;
-		padding-top: 7px;
-		padding-bottom: 7px;
+		line-height: @li-size;
+		height: @li-size;
+		padding: 0 10px;
+		cursor: pointer;
+
 		&:hover {
 			background-color: @grayLighter;	
 		}
 		&:not(:last-child) {
 			border-bottom: 1px solid @grayLighter;
 		}
+
+		border-bottom: 1px solid #efefef;
 	}
+}
+
+/* Generic Classes */
+
+.paper {
+	background: white;
 }

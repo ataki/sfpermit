@@ -8,6 +8,17 @@ define(function(require) {
     Backbone = require("backbone");
     config = require("config");
 
+    // universal data
+    var data = {};
+
+    function get(name) {
+        return data[name];
+    }
+
+    function persist(name, d) {
+        data[name] = d;
+    }
+
     function setup() {}
 
     // should be internal; expose for ease of prototyping
@@ -57,6 +68,8 @@ define(function(require) {
     return {
         setup: setup,
         endpoint: endpoint,
+        get: get,
+        persist: persist,
         // Models
         Permit: Permit,
         SearchResults: SearchResults,

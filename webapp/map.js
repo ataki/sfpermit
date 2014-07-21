@@ -14,6 +14,7 @@ define(function(require) {
     var HelpControl = require("controls/help-control");
     var MenuControl = require("controls/menu-control");
     var SearchControl = require("controls/search-control");
+    var ListControl = require("controls/list-control");
     var GlobalAlert = require("utils/global-alert");
 
     var Map = L.map('map', {'zoomControl': false});
@@ -22,14 +23,12 @@ define(function(require) {
     
     var ctrls = {
       'search': new SearchControl(),
-      'menu': new MenuControl()
+      'menu': new MenuControl(),
+      'list': new ListControl()
     };
 
     // controls that are always active
-    var activeControls = [
-        'search', 'menu'
-    ];
-
+    var activeControls = ['menu'];
 
     function generateSDKUrl(key, mapId) {
         return 'http://{s}.tiles.mapbox.com/v3/' + mapId + '/{z}/{x}/{y}.png';
@@ -86,7 +85,6 @@ define(function(require) {
 
         _.each(options.data, function(lead) {
             var address = new Store.Address(lead);
-            console.log(address);
             if (address.validate()) {
                 var addr = address.toMapView();
                 L.marker(addr)
@@ -113,16 +111,31 @@ define(function(require) {
         //     hidePanelCtrls();
         //     ctrls.help.showView();
         // });
-        // Backbone.on('show.search', function() {
-        //     hidePanelCtrls();
-        // });
         
         Backbone.on('show.search', function() {
             ctrls.search.showView();
+            disableMapInteractions();
         });
 
         Backbone.on('hide.search', function() {
             ctrls.search.hideView();
+            enableMapInteractions();
+        });
+
+        Backbone.on('list.show', function(data) {
+            if (!data) {
+                throw new Error("list view needs data!");
+            } 
+            console.log("Here");
+            disableMapInteractions();
+            ctrls.list.updateViewData(data);
+            ctrls.list.showView();
+        });
+
+        Backbone.on('list.hide', function() {
+            enableMapInteractions();
+            ctrls.list.cleanUpView();
+            ctrls.list.hideView();
         });
 
         Backbone.on('map.interaction.disable', function() {
@@ -145,6 +158,7 @@ define(function(require) {
     $(document).on("keyup", function(e) {
         if (e.which == 27) {
             Backbone.trigger("hide.search");
+            Backbone.trigger("list.hide");
         }
     });
 

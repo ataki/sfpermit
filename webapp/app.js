@@ -40,7 +40,9 @@ require([
 
     function launch() {
         var query = JSON.stringify({limit: 30});
+
     	$.getJSON(store.endpoint('permit'), {q: query}, function(results) {
+            store.persist('permits', results.objects);
             var permits = results.objects;   
             var initialView = [ permits[4].latitude, permits[4].longitude ];
 

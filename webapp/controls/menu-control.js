@@ -5,11 +5,13 @@ define(function(require) {
     Backbone = require("backbone");
     Mustache = require("mustache");
     Templates = require("templates");
+    Store = require("store");
 
     var Menu = Backbone.View.extend({
         id: 'menu-control',
         events: {
-            'click .target-search': 'showSearch'
+            'click .target-search': 'showSearch',
+            'click .target-permits': 'showPermits'
         },
         initialize: function() {
             _.bindAll(this, "showSearch");
@@ -24,6 +26,9 @@ define(function(require) {
         },
         showSearch: function(e) {
             Backbone.trigger("show.search");
+        },
+        showPermits: function(e) {
+            Backbone.trigger("list.show", Store.get("permits"));
         }
     });
 
