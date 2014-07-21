@@ -39,9 +39,11 @@ require([
     // map.js and then master-control.js
 
     function launch() {
-    	$.getJSON(store.endpoint('permit'), {'limit': 500}, function(results) {
+        var query = JSON.stringify({limit: 30});
+    	$.getJSON(store.endpoint('permit'), {q: query}, function(results) {
             var permits = results.objects;   
             var initialView = [ permits[4].latitude, permits[4].longitude ];
+
             Map.setup({
             	'key': config.APIKEY, 
             	'mapId': config.MAPBOX_MAP_ID,

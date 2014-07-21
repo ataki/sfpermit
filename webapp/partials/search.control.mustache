@@ -1,19 +1,17 @@
-<div class="container">
-    <div class="brand-bar">
-        <ul>
-            <li><img src="/images/logo_white.png" /></li>
-            <li>Bayes Impact</li> 
-            <li><a href="#">Permits</a></li>
-            <li><a href="#">Upload</a></li>
-            <li><a href="#">About</a></li>
-            <li><a href="/login">Login</a></li>
-        </ul>
-    </div>
-    <div class="search-control">
-        <form class="form-control">
-            <input type="text"></input>
-        </form>
-    </div>
-    <div class="search-results">
-    </div>
+<div id="search-bar-wrapper">
+    <!--
+    <a class="close">&times;</a>
+    -->
+    <form class="form-control">
+        <span class="search-prefix">Find permit proposals near</span><br/>
+        <input type="text" 
+            name="query" 
+            id="search-bar" 
+            class="no-input-default-style" 
+            autocomplete="off"
+            placeholder="(in San Francisco)"/>
+        <input type="submit" value="Go" style="visibility: hidden;"/>
+    </form>
+</div>
+<div class="search-results">
 </div>

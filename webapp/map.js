@@ -12,12 +12,8 @@ define(function(require) {
     var Store = require("store");
 
     var HelpControl = require("controls/help-control");
-    var LeadsControl = require("controls/leads-control");
-    var MasterControl = require("controls/master-control");
+    var MenuControl = require("controls/menu-control");
     var SearchControl = require("controls/search-control");
-    var LayersControl = require("controls/layers-control");
-    var ManagerControl = require("controls/manager-control");
-    var SettingsControl = require("controls/settings-control");
     var GlobalAlert = require("utils/global-alert");
 
     var Map = L.map('map', {'zoomControl': false});
@@ -26,7 +22,13 @@ define(function(require) {
     
     var ctrls = {
       'search': new SearchControl(),
+      'menu': new MenuControl()
     };
+
+    // controls that are always active
+    var activeControls = [
+        'search', 'menu'
+    ];
 
 
     function generateSDKUrl(key, mapId) {
@@ -36,13 +38,12 @@ define(function(require) {
     // global controls
     function hidePanelCtrls() {
         _.each(ctrls, function(ctrl, name) {
-            if (name !== "search" && name !== "master")
-                ctrl.hideView();
-        })
+            var match = _.find(activeControls, function(n) { return n == name;});
+            if (!match) ctrl.hideView();
+        });
         // in case any of the panels had disabled map interaciton
         enableMapInteractions();
     }
-
 
     function enableMapInteractions() {
         Map.dragging.enable();
@@ -97,7 +98,6 @@ define(function(require) {
 
         // enable global editing
         globalEditAlert.setMessage("Map editing disabled");
-        
 
         // add all map controls to map and hide
         _.each(ctrls, function(ctrl, name) {
@@ -109,26 +109,6 @@ define(function(require) {
 
         Map.addControl(L.control.zoom({'position': 'bottomleft'}))
 
-        // TODO delete this line after moving past design
-        // disableMapInteractions();
-
-        // listen for global control actions
-        // Backbone.on('show.layers', function() {
-        //     hidePanelCtrls();
-        //     ctrls.layers.showView();
-        // });
-        // Backbone.on('show.leads', function() {
-        //     hidePanelCtrls();
-        //     ctrls.leads.showView();
-        // });
-        // Backbone.on('show.manager', function() {
-        //     hidePanelCtrls();
-        //     ctrls.manager.showView();
-        // });
-        // Backbone.on('show.settings', function() {
-        //     hidePanelCtrls();
-        //     ctrls.settings.showView();
-        // });
         // Backbone.on('show.help', function() {
         //     hidePanelCtrls();
         //     ctrls.help.showView();
@@ -136,22 +116,37 @@ define(function(require) {
         // Backbone.on('show.search', function() {
         //     hidePanelCtrls();
         // });
+        
+        Backbone.on('show.search', function() {
+            ctrls.search.showView();
+        });
+
+        Backbone.on('hide.search', function() {
+            ctrls.search.hideView();
+        });
 
         Backbone.on('map.interaction.disable', function() {
             disableMapInteractions();
         });
+
         Backbone.on('map.interaction.enable', function() {
             enableMapInteractions();
         });
-        Backbone.on("map.goto", function(address) {
+
+        Backbone.on("map.setView", function(address) {
             var addr = address.toMapView();
             Map.panTo(addr);
-            L.marker(addr).addTo(Map)
-                .bindPopup(address.get('full_address'))
-                .openPopup();
-            Map.setZoom(config.DEFAULT_MAP_ZOOM);
+            Map.setZoom(address.get("zoom") || config.DEFAULT_MAP_ZOOM);
         });
-    }
+    };
+
+    // Interactions
+
+    $(document).on("keyup", function(e) {
+        if (e.which == 27) {
+            Backbone.trigger("hide.search");
+        }
+    });
 
     // Exports
     return {

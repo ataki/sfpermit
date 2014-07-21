@@ -57,9 +57,10 @@ define(function(require) {
     return {
         setup: setup,
         endpoint: endpoint,
+        // Models
         Permit: Permit,
         SearchResults: SearchResults,
         Schema: Schema,
-        Address: Address
+        Address: Address,
     }
 });

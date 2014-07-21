@@ -6,8 +6,10 @@ define(function(require) {
 	Mustache = require("mustache");
     Templates = require("templates");
     Store = require("store");
+    Forms = require("utils/forms");
 
 	var SearchResultsCollection = Store.SearchResults;
+	var Address = Store.Address;
 
 	var SearchResultsView = Backbone.View.extend({
 		tagName: "div",
@@ -20,41 +22,56 @@ define(function(require) {
 			Backbone.trigger('hide.search');
 		},
 		render: function(json) {
-            Templates.get("search.results").then(function(template) {
+			var _ref = this;
+            Templates.get("search.results").done(function(template) {
                 var html = Mustache.render(template, json);
-                this.$el.html(this.template(json));
+                _ref.$el.html(html);
             });
 			return this;
 		},
 		destroy: function() {
 			this.remove();
 		}
-	})
+	});
 
     // wrapper view
 	var SearchControlView = Backbone.View.extend({
 		tagName: "div",
 		id: "search-control-view",
 		events: {
-			"focus input": "addFocus",
-			"blur input": "removeFocus",
-			"keypress input": "debouncedSearch"
+			//"keyup input": "debouncedSearch",
+			"submit form": "zoomToLocation"
 		},
 		initialize: function() {
-			_.bindAll(this, "addFocus", "removeFocus", "showResults");
+			_.bindAll(this, "addFocus", "removeFocus", "showResults", "zoomToLocation");
 			this.collection = new SearchResultsCollection();
 			this.collection.on("reset", this.showResults);
 			this._resultsView = new SearchResultsView({
 				collection: this.collection
 			});
 		},
+		zoomToLocation: function(e) {
+			e.preventDefault();
+			e.stopPropagation();
+			var formData = Forms.serializeForm(this.$("form"));
+			var query = $.trim(formData.query) + " San Francisco";
+
+			$.getJSON("/geocode", {query: query}, function(response) {
+				if (response) {
+					console.log("going to address " + response.address);
+					var addr = new Address(response);
+					addr.set("zoom", 15);
+					Backbone.trigger("map.setView", addr);
+					Backbone.trigger("hide.search");
+				}
+			});
+		},
 		render: function() {
-            _ref = this;
-            Templates.get("search.control").then(function(template) {
-                console.log("finished");
-                var html = Mustache.render(_ref.template, json);
+            var _ref = this, resultsView = this._resultsView;
+            Templates.get("search.control").done(function(template) {
+                var html = Mustache.render(template, _ref.collection.toJSON());
                 _ref.$el.html(html);
-                _ref.$el.append(this._resultsView.render().el);
+                _ref.$el.append(resultsView.render().el);
             });
 			return this;
 		},
@@ -86,7 +103,7 @@ define(function(require) {
 		showResults: function() {
 			this._resultsView.show();
 		}
-	})
+	});
 
 	var SearchControl = L.Control.extend({
 		options: {
@@ -101,8 +118,14 @@ define(function(require) {
 			if (this.view) {
 				this.view.destroy();
 			}
+		},
+		hideView: function() {
+			this.view.$el.hide();
+		},
+		showView: function() {
+			this.view.$el.show();
 		}
-	}) 
+	});
 
 	return SearchControl;
 

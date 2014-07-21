@@ -3,6 +3,7 @@ define(function(require) {
     config = require("config");
 
     var store = {};
+    window.store = store;
 
     function setup() {
         // prefetch templates
@@ -13,18 +14,13 @@ define(function(require) {
     }
 
     function get(templateName) {
-        console.log("templates.js: getting " + templateName);
         var defer = $.Deferred();
         if (store[templateName]) {
             defer.resolve(store[templateName]);
         } else {
             var url = templateEndpoint(templateName);
             $.get(url, function(template) {
-                console.log("here");
-                console.log(template);
                 store[templateName] = template;
-                console.log(template);
-                console.log(store);
                 defer.resolve(store[templateName])
             });
         }

@@ -1,8 +1,6 @@
 import os
 
-from flask import Flask, request, Response
-from flask import render_template, url_for, redirect, send_from_directory, flash
-from flask import send_file, make_response, abort
+from flask import send_from_directory, make_response, abort, request
 
 from flask.ext.login import logout_user
 from flask.ext.security.core import current_user
@@ -14,8 +12,11 @@ from backend import app
 from backend.core import api_manager
 from backend.models import *
 
-default_model_config = {	
-	'url_prefix': app.config['API_ENDPOINT_PREFIX'],
+from geopy.geocoders import GoogleV3
+
+geolocator = GoogleV3()
+default_model_config = {
+    'url_prefix': app.config['API_ENDPOINT_PREFIX'],
     'methods': ['GET', 'POST']
 }
 
@@ -28,12 +29,26 @@ for model_name in app.config['API_MODELS']:
 
 session = api_manager.session
 
+
 @app.route('/logout')
 def logout():
     logout_user()
     return redirect_url("/")
 
+
+@app.route("/geocode")
+def geocode_api():
+    query = request.args.get("query")
+    address, (latitude, longitude) = geolocator.geocode(query)
+    return json.dumps({
+        'address': address,
+        'latitude': latitude,
+        'longitude': longitude
+    })
+
+
 # -------- API -------------
+
 
 # routing for basic pages (pass routing onto the Angular app)
 @app.route('/')
@@ -45,20 +60,24 @@ def basic_pages(**kwargs):
 @app.route('/me')
 @login_required
 def who_am_i():
-    if current_user and hasattr(current_user, 'username') and not current_user.is_anonymous():
-	    return make_response(current_user.as_json()) 
+    if current_user and \
+        hasattr(current_user, 'username') and \
+            not current_user.is_anonymous():
+        return make_response(current_user.as_json())
     else:
-	    abort(404)
+        abort(404)
+
 
 # special file handlers and error handlers
 @app.route('/favicon.ico')
 def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'),
-                 'img/favicon.ico')
+                               'img/favicon.ico')
 
 # @app.errorhandler(404)
 # def page_not_found(e):
     # return render_template('404.html'), 404
+
 
 @app.route("/site-map")
 def site_map():
@@ -70,4 +89,4 @@ def site_map():
             links.append(rule.endpoint)
     # links is now a list of url, endpoint tuples
 
-	return json.dumps(links)
+    return json.dumps(links)
