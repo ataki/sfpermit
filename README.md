@@ -1,7 +1,21 @@
+Note: README is a work in progress. 
+More detailed instructions forethcoming
+
 What
 ----------------
 
-Bayes Impact SF Peromits Project.
+Bayes Impact SF Permits Project.
+
+
+Prerequisite
+-----------------
+
+    Python 2.7+ (with pip)
+
+    MySQL
+
+    Unix Environment
+
 
 Installation
 ----------------
@@ -12,7 +26,11 @@ You should have virtualenv installed. If not, do:
 
 	(sudo) pip install virtualenv
 
-Activate using
+To create a virtual environment, run:
+
+    virtualenv venv
+
+Activate using:
 
 	source venv/bin/activate
   
@@ -22,14 +40,20 @@ Finally, to make sure you're up to date with project dependencies, do:
 
 and
 
-	cd static && bower update
+	cd webapp 
 
-Getting Started
+    npm install
+
+    bower install
+
+Populating the database
 -------------------
+
+This assumes you have mysql. Install, preferably through brew.
 
 Run
 
-	make db
+    make db
 
 to create the test database from the dataset in /data.
 
@@ -45,9 +69,9 @@ Then
 
 to run the server. Go to ```http://localhost:5000``` to see the page.
 
-/static contains js and less dependencies. Start there for the web app work.
+/webapp contains js and less dependencies. Start there for the web app work.
 
-server.py contains a prototpyed api endpoint for now.
+routes.py contains a prototpyed api endpoint for now.
 
 /templates contains server-side templates (and may include client-side
 in the future).

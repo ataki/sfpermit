@@ -1,11 +1,11 @@
 db:
 	@echo "Set up the database..."
-	python process.py
+	mysql test < import_clean.sql
 
 serve:
 	@echo "Start test server..."
-	python server.py
+	@./run.py server
 
 dev:
 	@echo "Recompile CSS dynamically..."
-	node static/watcher.js
+	@node webapp/lesswatcher.js
