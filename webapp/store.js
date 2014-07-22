@@ -64,6 +64,14 @@ define(function(require) {
         }
     });
 
+    var Permit = Backbone.Model.extend({
+        validate: function() {
+           return true; 
+        },
+        getAddress: function() {
+            return [this.get("latitude"), this.get("longitude")];
+        }
+    });
 
     return {
         setup: setup,
@@ -75,5 +83,6 @@ define(function(require) {
         SearchResults: SearchResults,
         Schema: Schema,
         Address: Address,
+        Permit: Permit
     }
 });

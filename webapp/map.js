@@ -83,15 +83,19 @@ define(function(require) {
             maxZoom: 18
         }).addTo(Map);
 
-        _.each(options.data, function(lead) {
-            var address = new Store.Address(lead);
-            if (address.validate()) {
-                var addr = address.toMapView();
-                L.marker(addr)
-                    .addTo(Map)
-                    .bindPopup(address.get("project_name"))
-                    .openPopup();
-            }
+        Templates.get("map.popup").done(function(template) {
+            _.each(options.data, function(d) {
+                var permit = new Store.Permit(d);
+                if (permit.validate()) {
+                    var addr = permit.getAddress();
+                    var json = permit.toJSON();
+                    var html = Mustache.render(template, json);
+                    L.marker(addr)
+                        .addTo(Map)
+                        .bindPopup(html)
+                        .openPopup();
+                }
+            });
         });
 
         // enable global editing

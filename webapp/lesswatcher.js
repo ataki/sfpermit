@@ -9,7 +9,7 @@ var config = {
 };
 
 function getPath(p) {
-    return path.join(process.cwd(), p);
+    return path.join(process.cwd(), 'webapp', p);
 }
 
 watch.watchTree(getPath(config.dir), function (f, curr, prev) {
