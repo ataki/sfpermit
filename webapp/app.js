@@ -9,6 +9,7 @@ requirejs.config({
 		underscore: 'bower_components/underscore/underscore',
 		mustache: 'bower_components/mustache/mustache',
 		leaflet: 'bower_components/leaflet/dist/leaflet',
+        leaflet_markercluster: 'bower_components/leaflet.markercluster/dist/leaflet.markercluster'
 	},
 
 	shim: {
@@ -19,6 +20,10 @@ requirejs.config({
 		leaflet: {
 			exports: 'L'
 		},
+
+        leaflet_markercluster: {
+            deps: ['leaflet']
+        },
 
 		backbone: {
 			deps: ['jquery', 'underscore'],

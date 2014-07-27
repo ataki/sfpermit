@@ -20,6 +20,7 @@
 	a {
 		color: inherit;	
 		text-decoration: none;
+
 	}
 }
 
@@ -118,6 +119,7 @@
 	background: none;
 	-webkit-appearance: none;
 	box-shadow: none !important;
+	line-height: normal;
 	&:focus { outline: 0; }
 }
 
@@ -161,19 +163,21 @@
 	}
 }*/
 
+.popup {
+	line-height: 24px;
+}
+
 /* Section::Menu */
 
 #menu-control {
-	@x: 0px;
-	@y: 0px;
-	@height: 40px;
+	@height: 44px;
     @font-size: 12px;
     @background: @blueDark;
 	@edgePadding: 10px;
 
 	// coordinates in map container
-	left: @x;
-	top: @y;
+	top: 0;
+	left: 0;
 
     position: fixed;
     font-size: @font-size;
@@ -207,7 +211,7 @@
 	        li { 
 	        	padding-top: @height / 4;
 	            width: @height * 2;
-	            height: @height * 3/4;
+	            height: @height;
 	            text-align: center;
 	            display: block; 
 	            float: left;
@@ -217,6 +221,12 @@
 	            	color: white;
 		            font-weight: 500;
 		        }
+
+		        &.ext { padding: @height / 4; text-align: center; width: auto; }
+		        &.ext-2 { width: @height * 4; }
+		        &.ext-3 { width: @height * 5; }
+		        &.ext-4 { width: @height * 8; }
+		        &.ext-6 { width: @height * 12; }
 	        }
 	        li.logo-container {
 	        	padding-top: 0;
@@ -260,11 +270,10 @@
 #search-results-list {
 	@width: @search-bar-width;
 	@li-height: 20px;
-	@max-num-visible: 10;
 
 	width: @width;
 	overflow: scroll;
-	max-height: @li-height * @max-num-visible;
+	height: 100%;
 
 	li {
 		height: @li-height;
@@ -343,26 +352,45 @@
 
 /* Section::List View */
 
+.leaflet-container {
+	#list-view {
+		h1, h2, h3 {
+			font-size: 28px;
+			line-height: normal;
+			margin: 0 0 12px 0;
+		}
+	}
+}
+
 #list-view {
-	@li-size: 50px;
+	@x: 0;
+	@y_r: 0;
+	@margin: 0;
+	@li-size: 12px;
 	@default-max-li: 10;
+	@min-width: 250px;
+	@font-size: 13px;
 
 	position: fixed;
-	top: 60px;
-	left: 32px;
-
-	margin: 0;
+	top: @x;
+	left: 830px; // hard-coded for now
+	right: @y_r;
+	margin: @margin;
+	height: 100%;
+	min-width: @min-width;
+	font-size: @font-size;
 
 	.head {
-		height: 24px;
-		padding: 24px 0;
+		height: 88px;
+		padding: 10px;
 		border-bottom: 1px solid #efefef;
+		span { margin-right: 10px; }
 	}
 
-	h1, h2, h3, h4, h5, h6 {
-		padding: 0 10px;
-		margin: 0;
-	}
+	// h1, h2, h3, h4, h5, h6 {
+	// 	padding: 0 10px;
+	// 	margin: 0;
+	// }
 
 	// option and padding to be controlled
 	// by other properties
@@ -370,15 +398,14 @@
 	ul {
 		overflow: scroll;
 		margin: 0;
-		max-height: @li-size * @default-max-li;
+		height: 100%;
 	}
 
 	li { 
 		text-decoration: none;
 		color: #333;
 		vertical-align: middle;
-		line-height: @li-size;
-		height: @li-size;
+		line-height: 32px;
 		padding: 0 10px;
 		cursor: pointer;
 
@@ -390,6 +417,10 @@
 		}
 
 		border-bottom: 1px solid #efefef;
+	}
+
+	.sort-by {
+		cursor: pointer;
 	}
 }
 

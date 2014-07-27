@@ -5,13 +5,14 @@ from geopy.geocoders import GoogleV3
 geolocator = GoogleV3()
 
 errors = []
-for record in Permit.query.filter(Permit.latitude == 0):
+for record in Permit.query.all():
     try:
-        address, (latitude, longitude) = geolocator.geocode(record.project_name)
-        record.project_name = address
-        record.latitude = latitude
-        record.longitude = longitude
-        print "%s --> %f %f" % (record.project_name, latitude, longitude)
+        address, (lat, lng) = geolocator.geocode(record.project_name +
+            " San Francisco")
+        record.address = address
+        record.latitude = lat
+        record.longitude = lng
+        print "%s --> %f %f" % (record.project_name, lat, lng)
     except Exception:
         errors.append(record.project_name)
 db.session.commit()

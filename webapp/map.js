@@ -17,10 +17,20 @@ define(function(require) {
     var ListControl = require("controls/list-control");
     var GlobalAlert = require("utils/global-alert");
 
+    // leaflet map
     var Map = L.map('map', {'zoomControl': false});
 
+    // maps markers to a permit id; useful for reusing
+    // markers later on
+    var Markers = {};
+
+    // update current address when necessary
+    var CurrentAddress = Store.CurrentAddress;
+
+    // global alert; convenient to display messages
     var globalEditAlert = new GlobalAlert();
-    
+
+    // map of all leaflet controls
     var ctrls = {
       'search': new SearchControl(),
       'menu': new MenuControl(),
@@ -29,10 +39,6 @@ define(function(require) {
 
     // controls that are always active
     var activeControls = ['menu'];
-
-    function generateSDKUrl(key, mapId) {
-        return 'http://{s}.tiles.mapbox.com/v3/' + mapId + '/{z}/{x}/{y}.png';
-    }
 
     // global controls
     function hidePanelCtrls() {
@@ -44,27 +50,30 @@ define(function(require) {
         enableMapInteractions();
     }
 
+    // enables all listeners on leaflet map
     function enableMapInteractions() {
         Map.dragging.enable();
         Map.touchZoom.enable();
         Map.doubleClickZoom.enable();
-        Map.scrollWheelZoom.enable();
+        // Map.scrollWheelZoom.enable();
         Map.boxZoom.enable();
         Map.keyboard.enable();
-
         globalEditAlert.off();
     }
 
+    // disable all listeners on leaflet map
     function disableMapInteractions() {
-        console.log("disabling map interactions");
         Map.dragging.disable();
         Map.touchZoom.disable();
         Map.doubleClickZoom.disable();
-        Map.scrollWheelZoom.disable();
         Map.boxZoom.disable();
         Map.keyboard.disable();
 
         globalEditAlert.showPersistent();
+    }
+
+    function generateSDKUrl(key, mapId) {
+        return 'http://{s}.tiles.mapbox.com/v3/' + mapId + '/{z}/{x}/{y}.png';
     }
     
     // initial setup for controls 
@@ -72,11 +81,21 @@ define(function(require) {
         // allow custom keys in setup to override config keys
         var key = options.key || config.APIKEY
             , mapId = options.mapId
-            , data = options.data
-            , initialView = options.initialView;
+            , data = options.data;
 
-        // create "global" map
-        Map.setView(initialView, 11);
+        if (CurrentAddress.get("latitude") != 0 && CurrentAddress.get("longitude") != 0) {
+            var initialView = CurrentAddress.toMapView();
+            Map.setView(initialView, 16);
+        } else {
+            CurrentAddress.once("change", function(address) {
+                // create "global" map
+                var initialView = CurrentAddress.toMapView();
+                Map.setView(initialView, 16);
+            });
+        }
+
+        // Disable scrolling to allow for scrolling on panels
+        Map.scrollWheelZoom.disable();
 
         L.tileLayer(generateSDKUrl(key, mapId), {
             attribution: 'Map data &copy;',
@@ -90,10 +109,11 @@ define(function(require) {
                     var addr = permit.getAddress();
                     var json = permit.toJSON();
                     var html = Mustache.render(template, json);
-                    L.marker(addr)
+                    var marker = L.circleMarker(addr, {color: permit.getColor()})
+                        .setRadius(permit.getNetUnitRadius())
                         .addTo(Map)
-                        .bindPopup(html)
-                        .openPopup();
+                        .bindPopup(html);
+                    Markers[d.id] = marker;
                 }
             });
         });
@@ -117,6 +137,7 @@ define(function(require) {
         // });
         
         Backbone.on('show.search', function() {
+            ctrls.list.hideView();
             ctrls.search.showView();
             disableMapInteractions();
         });
@@ -126,17 +147,17 @@ define(function(require) {
             enableMapInteractions();
         });
 
-        Backbone.on('list.show', function(data) {
+        Backbone.on('show.list', function(data) {
             if (!data) {
                 throw new Error("list view needs data!");
             } 
-            console.log("Here");
-            disableMapInteractions();
+            //disableMapInteractions();
+            ctrls.search.hideView();
             ctrls.list.updateViewData(data);
             ctrls.list.showView();
         });
 
-        Backbone.on('list.hide', function() {
+        Backbone.on('hide.list', function() {
             enableMapInteractions();
             ctrls.list.cleanUpView();
             ctrls.list.hideView();
@@ -150,21 +171,35 @@ define(function(require) {
             enableMapInteractions();
         });
 
-        Backbone.on("map.setView", function(address) {
+        Backbone.on("map.setView", function(address, d) {
             var addr = address.toMapView();
             Map.panTo(addr);
             Map.setZoom(address.get("zoom") || config.DEFAULT_MAP_ZOOM);
+            console.log(address.toMapView());
+            CurrentAddress.set({
+                latitude: address.get("latitude"),
+                longitude: address.get("longitude")
+            });
+
+            if (d) {
+                var marker = Markers[d.id];
+                if (marker) {
+                    setTimeout(function() {
+                        marker.openPopup();
+                    }, 500);
+                }
+            }
         });
     };
 
-    // Interactions
-
+    // hide all controls when esc key is pressed
     $(document).on("keyup", function(e) {
         if (e.which == 27) {
             Backbone.trigger("hide.search");
             Backbone.trigger("list.hide");
         }
     });
+
 
     // Exports
     return {

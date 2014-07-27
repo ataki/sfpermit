@@ -83,7 +83,7 @@ class Permit(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     case_number = db.Column(db.String(16))
     total_records_by_case = db.Column(db.Integer)
-    project_name = db.Column(db.String(256))  # also address
+    project_name = db.Column(db.String(256))
     net_units = db.Column(db.Integer)
     block_lot = db.Column(db.Integer)
     min_filed = db.Column(db.DateTime)
@@ -135,6 +135,8 @@ class Permit(db.Model):
     unitgrp2 = db.Column(db.Integer)
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
+    address = db.Column(db.String(256))
+    prediction = db.Column(db.Float)
 
     def __repr__(self):
         return "<Permit at %s>" % self.project_name
@@ -160,7 +162,7 @@ app.config['API_MODELS'] = {
     'permit': {
         'model_class': Permit,
         'methods': ['GET', 'POST', 'PUT'],
-        'results_per_page': 40,
-        'max_results_per_page': 50
+        'results_per_page': 200,
+        'max_results_per_page': 300
     }
 }

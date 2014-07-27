@@ -1,32 +1,31 @@
-Note: README is a work in progress. 
-More detailed instructions forethcoming
+README is a work in progress. 
+Author: Jim Zheng
 
-What
-----------------
+# What
 
 Bayes Impact SF Permits Project.
 
 
-Prerequisite
------------------
+# Prerequisite
+
+    Macbook Pro
 
     Python 2.7+ (with pip)
 
     MySQL
 
-    Unix Environment
+    NodeJS
+
+    Brew
 
 
-Installation
-----------------
-
-Target: Mac OSX, 10.8+
+# Installation
 
 You should have virtualenv installed. If not, do:
 
 	(sudo) pip install virtualenv
 
-To create a virtual environment, run:
+To create a virtual environment, run in project root:
 
     virtualenv venv
 
@@ -46,8 +45,8 @@ and
 
     bower install
 
-Populating the database
--------------------
+
+# Populating the database
 
 This assumes you have mysql. Install, preferably through brew.
 
@@ -69,6 +68,15 @@ Then
 
 to run the server. Go to ```http://localhost:5000``` to see the page.
 
+If you want to compile to CSS, do
+
+  node webapp/lesswatcher.js
+
+This starts a watcher that recompiles as you save.
+
+
+# Overview
+
 /webapp contains js and less dependencies. Start there for the web app work.
 
 routes.py contains a prototpyed api endpoint for now.
@@ -76,19 +84,10 @@ routes.py contains a prototpyed api endpoint for now.
 /templates contains server-side templates (and may include client-side
 in the future).
 
-Overview
-----------------
-
 We use Flask to serve stuff. Check out its documentation here[http://flask.pocoo.org/docs/].
 
 Bower is used to manage static assets. 
 
-TODOs
--------------------
+LESS is used to style things; it gets compiled using CSS. You need to
 
-v0.1
-
-  - Upload of data
-  - Geo-visualization of permits
-  - permit update form
-  - permit creation form
+Use virtualenv to keep things reusable. 

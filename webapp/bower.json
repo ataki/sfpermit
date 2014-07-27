@@ -21,6 +21,7 @@
     "underscore": "~1.6.0",
     "backbone": "~1.1.2",
     "mustache": "~0.8.1",
-    "bootstrap": "~3.2.0"
+    "bootstrap": "~3.2.0",
+    "leaflet.markercluster": "~0.4.0"
   }
 }

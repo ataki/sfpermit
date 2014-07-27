@@ -7,6 +7,12 @@ define(function(require) {
     Templates = require("templates");
     Store = require("store");
 
+    /**
+    * Represents the Menu at the top
+    */
+
+    var CurrentAddress = Store.CurrentAddress;
+
     var Menu = Backbone.View.extend({
         id: 'menu-control',
         events: {
@@ -19,16 +25,33 @@ define(function(require) {
         render: function() {
             var _ref = this;
             Templates.get("menu.control").done(function(template) {
-                var html = Mustache.render(template, {});
-                _ref.$el.html(html);
+                _ref.afterTemplateFetch(template);
+            });
+            CurrentAddress.on("change", function() {
+                var lat = CurrentAddress.get("latitude")
+                    , lng = CurrentAddress.get("longitude");
+                _ref.updateCurrentAddress(lat, lng);
             });
             return this;
+        },
+        afterTemplateFetch: function(template) {
+            var html = Mustache.render(template, {});
+            this.$el.html(html);
+            // in case the get happens before the event has
+            // had time to bind
+            var lat = CurrentAddress.get("latitude")
+            , lng = CurrentAddress.get("longitude");
+            this.updateCurrentAddress(lat, lng);
         },
         showSearch: function(e) {
             Backbone.trigger("show.search");
         },
         showPermits: function(e) {
-            Backbone.trigger("list.show", Store.get("permits"));
+            Backbone.trigger("show.list", Store.get("permits"));
+        },
+        updateCurrentAddress: function(lat, lng) {
+            $(".latitude").text(lat.toFixed(2))
+            $(".longitude").text(lng.toFixed(2));
         }
     });
 
