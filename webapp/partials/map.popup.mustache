@@ -1,6 +1,9 @@
 <div class="popup">
-    <strong>{{project_name}}</strong>
-    <span class="label label-success">{{prediction}} chance of approval</span><br/>
-    <strong>Days Active</strong>: <span class="label label-warning">{{days}}</span><br/>
-    <strong>Net Units</strong>: {{net_units}}<br/>
+    <h3><strong>{{project_name}}</strong></h3>
+    <div><i class="fa fa-map-marker"></i> <span class="text-gray">{{address}}</span></div>
+    <p> 
+        This permit has a <span class="text-{{prediction_level}}">{{prediction}} chance of approval</span><br/>
+        It has been active for <span class="text-{{days_level}}">{{days}}</span> days<br/>
+        and has {{net_units}} net units.<br/>
+    </p>
 </div>

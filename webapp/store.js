@@ -114,8 +114,37 @@ define(function(require) {
             var domain = [0, 729];
             var range = [20, 100];
             var output = (range[1] - range[0]) * net_units / domain[1] + range[0]
-            console.log(net_units + " --> " + output);
             return output;
+        },
+        determinePredictionLevel: function() {
+            var level = this.get("prediction");
+            if (level > 0.6) {
+                return "success";
+            }
+            else if (level > 0.3) {
+                return "warning";
+            }
+            else {
+                return "danger";
+            }
+        },
+        determineDaysLevel: function() {
+            var days = this.get("days");
+            if (days > 300) {
+                return "danger";
+            }
+            else if (days > 100) {
+                return "warning";
+            }
+            else {
+                return "success";
+            }
+        },
+        toJSON: function() {
+           var attributes = _.clone(this.attributes);
+           attributes.prediction_level = this.determinePredictionLevel();
+           attributes.days_level = this.determineDaysLevel(); 
+           return attributes;
         }
     });
 
