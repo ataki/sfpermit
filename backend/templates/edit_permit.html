@@ -1,0 +1,25 @@
+<html>
+  <head>
+      <link href='https://fonts.googleapis.com/css?family=Open+Sans:700,400,300' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="/bower_components/leaflet/dist/leaflet.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/index.css" type="text/css" />
+  </head>
+  <body>
+    {% from "_formhelpers.html" import render %}
+    <div class="container edit-permit-form-container">
+      <h2>Permit {{ model.project_name }}</h2>
+      <p>
+        When done editing, remember to save your changes by pressing 
+        the "Save" button below
+      </p>
+      <hr/>
+      <form class="form edit-permit-form" method="post" action="/edit/{{ model.id }}">
+        {{ render(form) }}
+        <br/>
+        <button type="submit" class="btn btn-danger">Save Permit</button>
+        <button type="button" class="btn">Cancel</button>
+      </form>
+    </div>    
+  </body>
+</html>

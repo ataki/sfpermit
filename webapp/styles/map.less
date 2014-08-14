@@ -18,9 +18,7 @@
 	font-size: @default-font-size;
 
 	a {
-		color: inherit;	
 		text-decoration: none;
-
 	}
 }
 
@@ -373,7 +371,6 @@
 
 	position: fixed;
 	top: @x;
-	left: 830px; // hard-coded for now
 	right: @y_r;
 	margin: @margin;
 	height: 100%;
@@ -381,7 +378,7 @@
 	font-size: @font-size;
 
 	.head {
-		height: 88px;
+		height: 54px;
 		padding: 10px;
 		border-bottom: 1px solid #efefef;
 		span { margin-right: 10px; }
@@ -428,4 +425,19 @@
 
 .paper {
 	background: white;
+}
+
+
+.flashes {
+	position: fixed;
+	width: 140px;	
+	height: 50px;
+	margin: auto;
+	z-index: 9999;
+	padding: 7px 10px;
+	background-color: lighten(#FFEF00, 10%);
+	font-size: 12px;
+	font-weight: 700;
+	text-align: center;
+	.box-shadow(1px 2px 5px @grayLighter);
 }

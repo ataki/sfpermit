@@ -1,12 +1,16 @@
 import os
-
-from flask import send_from_directory, make_response, abort, request
+from flask import send_from_directory, make_response, abort, \
+    request, render_template, flash, redirect, url_for
 
 from flask.ext.login import logout_user
 from flask.ext.security.core import current_user
 from flask.ext.security.decorators import login_required
 
 from backend import app
+
+from flask.ext.wtf import Form
+from wtforms.ext.sqlalchemy.orm import model_form
+from backend.models import Permit
 
 # routing for API endpoints (generated from the models designated as API_MODELS)
 from backend.core import api_manager
@@ -47,13 +51,26 @@ def geocode_api():
     })
 
 
-# -------- API -------------
-
-
 # routing for basic pages (pass routing onto the Angular app)
 @app.route('/')
-def basic_pages(**kwargs):
-    return make_response(open('backend/templates/index.html').read())
+def basic_pages():
+    return render_template('index.html')
+
+
+@app.route('/edit/<int:permit_id>', methods=['GET', 'POST'])
+def edit_permit(permit_id):
+    PermitForm = model_form(Permit, Form)
+    model = Permit.query.get(permit_id)
+    form = PermitForm(request.form, model)
+
+    print request.method
+    if request.method == "POST" and form.validate():
+        form.populate_obj(model)
+        db.session.add(model)
+        db.session.commit()
+        flash("Changes saved")
+        return redirect("/")
+    return render_template("edit_permit.html", form=form, model=model)
 
 
 # gets current user data as json
