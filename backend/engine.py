@@ -1,6 +1,7 @@
-import preprocess_data as process
+import backend.preprocess_data as process
+import backend.model_params as params
 from scipy import *
-from backend.models import *
+from models import *
 from sklearn.linear_model import LogisticRegression
 from sklearn.grid_search import GridSearchCV
 
@@ -29,17 +30,19 @@ def getExamples():
     return Permit.query.all()
 
 
-def fit_model(train_data, response, pred_data):
+def fit_model(train_data, response, pred_data, scoring):
     param_grid = {'C': [x * .1 for x in range(1, 100)],
                   'penalty': ['l1', 'l2']}
     logit = LogisticRegression(fit_intercept=True)
+
     opt_model = GridSearchCV(logit, param_grid,
-                             scoring='precision', cv=10, n_jobs=-1)
-    # Hack: drop nan rows for now.
-    train_data = train_data.drop(0)
-    response = response.drop(1)
+                             scoring=scoring,
+                             cv=10,
+                             n_jobs=-1)
+    
     opt_model.fit(X=train_data, y=response)
-    return opt_model
+    score = opt_model.best_score_
+    return opt_model, score
 
 
 def predict(model, newdata):
@@ -55,19 +58,23 @@ def insert_pred(prediction, id):
 
 
 def train(data):
+    scoring = params.get_scoring()
+    cat_features = params.get_features()
     # Gen response field, open/closed case indices
     response = process.gen_response(data=data)
     train_idx, open_idx = process.open_closed_split(data)
     # Construct Design Matrix
-    design_matrix = process.engineer_features(data=data)
+    design_matrix = process.engineer_features(data=data, 
+                                              cat_features = cat_features)
     # Split design matrix into currently open and training data
     train_data = design_matrix.loc[train_idx]
     train_response = response[train_idx]
     open_cases = design_matrix.loc[open_idx]
     # Train Model
-    model = fit_model(train_data=train_data,
+    model, score = fit_model(train_data=train_data,
                       response=train_response,
-                      pred_data=open_cases)
+                      pred_data=open_cases,
+                      scoring = scoring)
     prediction = predict(model, open_cases)
     # Insert predicted probabiliesies
     for pred, idx in zip(prediction, open_cases.index):
@@ -77,5 +84,8 @@ def train(data):
 def init():
     examples = [x for x in getExamples()]
     data = process.parse_points(examples)
-    # filtered_data = process.filter_data(data=data)
+    filtered_data = process.filter_data(data=data)
     train(data)
+
+if __name__ == '__main__':
+    init()

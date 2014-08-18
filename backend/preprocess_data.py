@@ -27,11 +27,15 @@ def parse_points(points, features=None):
         for feat in features:
             feature_map[feat].append(point.__dict__[feat])
     df = pd.DataFrame(feature_map, index=index)
+
+    print df.shape
+    df = df.dropna(axis=0)
+    print df.shape
     return df
 
 
 def filter_data(data):
-    data = data[pd.isnull(rawdata['final_status']) == False]
+    data = data[pd.isnull(data['final_status']) == False]
     data['min_filed'] = pd.to_datetime(data['min_filed'])
     data = data.groupby('project_name').filter(lambda x: len(x) == 1)
     data = data.dropna(axis=0)
@@ -59,7 +63,9 @@ def _make_time_features(data):
     for semiannual in [183*x for x in range(6)]:
         cat = np.array(map(lambda x: int(x > semiannual), days))
         cats['cum_days_' + str(semiannual)] = cat
+
     df = pd.DataFrame(cats).iloc[:, 1:]
+    df.index = data.index
     return df
 
 
@@ -71,18 +77,16 @@ def _make_units_feature(data):
     return data
 
 
-CATEGORY_FEATURES = ['net_units_group', 'c', 'v', 'x', 'd', 'a', 'r']
+def engineer_features(data, cat_features=None):
 
-
-def engineer_features(data):
-    global CATEGORY_FEATURES
-    base = _make_time_features(data)
+    data = data.copy()
     data = _make_units_feature(data)
-    for catfeature in CATEGORY_FEATURES:
+    base = _make_time_features(data)
+    for catfeature in cat_features:
         dummies = pd.get_dummies(data[catfeature], prefix=catfeature + '_')
         base = base.join(dummies.iloc[:, 1:])
-    dm = pd.DataFrame(base)
-    return dm
+
+    return base
 
 
 def open_closed_split(data):
