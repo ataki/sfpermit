@@ -140,10 +140,17 @@ define(function(require) {
                 return "success";
             }
         },
+        roundPrediction: function(pred) {
+            if (pred)
+                return pred.toFixed(2);
+            else 
+                return 0.00;
+        },
         toJSON: function() {
            var attributes = _.clone(this.attributes);
            attributes.prediction_level = this.determinePredictionLevel();
            attributes.days_level = this.determineDaysLevel(); 
+           attributes.prediction = this.roundPrediction(attributes.prediction)
            return attributes;
         }
     });
