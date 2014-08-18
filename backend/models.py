@@ -136,6 +136,7 @@ class Permit(db.Model):
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
     address = db.Column(db.String(256))
+    final_status = db.Column(db.String(64))
     prediction = db.Column(db.Float)
 
     def __repr__(self):

@@ -1,6 +1,6 @@
 use test;
 
-load data local infile "./observations.csv"
+load data local infile "data/observations.csv"
 into table sfp_permit 
 fields terminated by ","
 optionally enclosed by '"'
