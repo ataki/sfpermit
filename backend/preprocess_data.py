@@ -12,7 +12,7 @@ def parse_points(points, features=None):
                     'net_units',
                     'project_name',
                     'planning_approved',
-                    'Days',
+                    'days',
                     'c',
                     'v',
                     'x',
@@ -25,7 +25,7 @@ def parse_points(points, features=None):
     for point in points:
         index.append(point.id)
         for feat in features:
-            feature_map[feat].append(x[feat])
+            feature_map[feat].append(point.__dict__[feat])
     df = pd.DataFrame(feature_map, index=index)
     return df
 
@@ -75,6 +75,7 @@ CATEGORY_FEATURES = ['net_units_group', 'c', 'v', 'x', 'd', 'a', 'r']
 
 
 def engineer_features(data):
+    global CATEGORY_FEATURES
     base = _make_time_features(data)
     data = _make_units_feature(data)
     for catfeature in CATEGORY_FEATURES:

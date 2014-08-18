@@ -4,6 +4,7 @@ import os
 import sys
 from backend import app
 from backend.core import db
+import backend.engine as engine
 
 
 def create():
@@ -11,6 +12,7 @@ def create():
 
 
 def server():
+    engine.init()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='127.0.0.1', port=port, debug=True)
 

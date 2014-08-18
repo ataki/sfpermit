@@ -1,23 +1,22 @@
 use test;
 
-load data local infile "data/observations.csv"
+load data local infile "data/data.csv"
 into table sfp_permit 
 fields terminated by ","
 optionally enclosed by '"'
 lines terminated by "\n"
 ignore 1 lines
 (
-	id,
 	case_number,
 	total_records_by_case,
 	project_name,
 	net_units,
 	block_lot,
-	min_filed,
-	max_action,
+	@min_filed,
+	@max_action,
 	allowed_height,
 	plan_area,
-	case_decision_date,
+	@case_decision_date,
 	case_decision,
 	q4_report_status,
 	last_planning_suffix,
@@ -25,11 +24,17 @@ ignore 1 lines
 	days,
 	er_complete,
 	er_interim,
+	er_open,
+	cat_ex_32,
+	cpe,
+	neg_dec,
+	eir,
+	e,
 	c,
 	v,
 	x,
 	d,
-	bp,
+	a,
 	r,
 	total,
 	diff,
@@ -45,19 +50,15 @@ ignore 1 lines
 	blocklot_in_q4_report,
 	in_q4_report,
 	missing_data,
+	final_status,
 	case_year,
 	filing_year,
 	action_year,
-	notes,
-	more,
-	manual_exclusion,
-	qc_check_against_quarterly,
-	possible_false_negative,
-	overridden_date,
-	unitgrp,
-	hgrp1,
-	hgrp2,
-	m,
-	ydiff,
-	unitgrp2
-);
+	should_be,
+	reason,
+	project_size_class
+)
+set 
+	min_filed = STR_TO_DATE(@min_filed, "%m/%d/%Y %H:%M"),
+	max_action = STR_TO_DATE(@max_action, "%m/%d/%Y %H:%M"),
+	case_decision_date = STR_TO_DATE(@case_decision_date, "%m/%d/%Y %H:%M");

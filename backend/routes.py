@@ -1,6 +1,6 @@
 import os
 from flask import send_from_directory, make_response, abort, \
-    request, render_template, flash, redirect, url_for
+    request, render_template, flash, redirect
 
 from flask.ext.login import logout_user
 from flask.ext.security.core import current_user

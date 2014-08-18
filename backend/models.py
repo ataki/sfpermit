@@ -6,7 +6,8 @@ import simplejson as json
 
 # ----------- User -------------
 
-roles_users = db.Table('sfp_roles_users',
+roles_users = db.Table(
+    'sfp_roles_users',
     db.Column('user_id', db.Integer(), db.ForeignKey('sfp_user.id')),
     db.Column('role_id', db.Integer(), db.ForeignKey('sfp_role.id'))
 )
@@ -22,7 +23,7 @@ class User(db.Model):
     active = db.Column(db.Integer())
     confirmed_at = db.Column(db.DateTime())
     roles = db.relationship('Role', secondary=roles_users,
-        backref=db.backref('users', lazy='dynamic'))
+                            backref=db.backref('users', lazy='dynamic'))
 
     # Custom methods to manage password auth
 
@@ -80,6 +81,7 @@ def validate_user_request(form):
 class Permit(db.Model):
     __tablename__ = 'sfp_permit'
 
+    # Original fields
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     case_number = db.Column(db.String(16))
     total_records_by_case = db.Column(db.Integer)
@@ -98,11 +100,17 @@ class Permit(db.Model):
     days = db.Column(db.Integer)
     er_complete = db.Column(db.Integer)
     er_interim = db.Column(db.Integer)
+    er_open = db.Column(db.Integer)
+    cat_ex_32 = db.Column(db.Integer)
+    cpe = db.Column(db.Integer)
+    neg_dec = db.Column(db.Integer)
+    eir = db.Column(db.Integer)
+    e = db.Column(db.Integer)
     c = db.Column(db.Integer)
     v = db.Column(db.Integer)
     x = db.Column(db.Integer)
     d = db.Column(db.Integer)
-    bp = db.Column(db.Integer)
+    a = db.Column(db.Integer)
     r = db.Column(db.Integer)
     total = db.Column(db.Integer)
     diff = db.Column(db.Integer)
@@ -118,25 +126,85 @@ class Permit(db.Model):
     blocklot_in_q4_report = db.Column(db.Integer)
     in_q4_report = db.Column(db.Integer)
     missing_data = db.Column(db.Integer)
+    final_status = db.Column(db.String(64))
     case_year = db.Column(db.Integer)
     filing_year = db.Column(db.Integer)
     action_year = db.Column(db.Integer)
-    notes = db.Column(db.String(512))
-    more = db.Column(db.String(512))
-    manual_exclusion = db.Column(db.String(64))
-    qc_check_against_quarterly = db.Column(db.Integer)
-    possible_false_negative = db.Column(db.String(16))
-    overridden_date = db.Column(db.Integer)
-    unitgrp = db.Column(db.Integer)
-    hgrp1 = db.Column(db.Integer)
-    hgrp2 = db.Column(db.Integer)
-    m = db.Column(db.Integer)
-    ydiff = db.Column(db.Integer)
-    unitgrp2 = db.Column(db.Integer)
+    should_be = db.Column(db.String(64))
+    reason = db.Column(db.String(64))
+    project_size_class = db.Column(db.String(16))
+
+    # Own, augmented fields
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
     address = db.Column(db.String(256))
+    prediction = db.Column(db.Float)
+
+    def __repr__(self):
+        return "<Permit at %s>" % self.project_name
+
+
+class StagedPermit(db.Model):
+    """Batches updates to the model. Periodic migration
+    from this table into the original table."""
+
+    # Original fields
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    case_number = db.Column(db.String(16))
+    total_records_by_case = db.Column(db.Integer)
+    project_name = db.Column(db.String(256))
+    net_units = db.Column(db.Integer)
+    block_lot = db.Column(db.Integer)
+    min_filed = db.Column(db.DateTime)
+    max_action = db.Column(db.DateTime)
+    allowed_height = db.Column(db.Float)
+    plan_area = db.Column(db.Integer)
+    case_decision_date = db.Column(db.DateTime)
+    case_decision = db.Column(db.String(16))
+    q4_report_status = db.Column(db.String(64))
+    last_planning_suffix = db.Column(db.String(16))
+    last_planning_action = db.Column(db.String(16))
+    days = db.Column(db.Integer)
+    er_complete = db.Column(db.Integer)
+    er_interim = db.Column(db.Integer)
+    er_open = db.Column(db.Integer)
+    cat_ex_32 = db.Column(db.Integer)
+    cpe = db.Column(db.Integer)
+    neg_dec = db.Column(db.Integer)
+    eir = db.Column(db.Integer)
+    e = db.Column(db.Integer)
+    c = db.Column(db.Integer)
+    v = db.Column(db.Integer)
+    x = db.Column(db.Integer)
+    d = db.Column(db.Integer)
+    a = db.Column(db.Integer)
+    r = db.Column(db.Integer)
+    total = db.Column(db.Integer)
+    diff = db.Column(db.Integer)
+    multiple = db.Column(db.Integer)
+    cancelled_planning = db.Column(db.Integer)
+    cancelled_bp = db.Column(db.Integer)
+    in_current_planning = db.Column(db.Integer)
+    bp_reinstated = db.Column(db.Integer)
+    bp_issued = db.Column(db.Integer)
+    occupancy_permit = db.Column(db.Integer)
+    planning_approved = db.Column(db.Integer)
+    case_in_q4_report = db.Column(db.Integer)
+    blocklot_in_q4_report = db.Column(db.Integer)
+    in_q4_report = db.Column(db.Integer)
+    missing_data = db.Column(db.Integer)
     final_status = db.Column(db.String(64))
+    case_year = db.Column(db.Integer)
+    filing_year = db.Column(db.Integer)
+    action_year = db.Column(db.Integer)
+    should_be = db.Column(db.String(64))
+    reason = db.Column(db.String(64))
+    project_size_class = db.Column(db.String(16))
+
+    # Own, augmented fields
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+    address = db.Column(db.String(256))
     prediction = db.Column(db.Float)
 
     def __repr__(self):

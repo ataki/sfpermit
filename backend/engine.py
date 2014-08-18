@@ -35,6 +35,9 @@ def fit_model(train_data, response, pred_data):
     logit = LogisticRegression(fit_intercept=True)
     opt_model = GridSearchCV(logit, param_grid,
                              scoring='precision', cv=10, n_jobs=-1)
+    # Hack: drop nan rows for now.
+    train_data = train_data.drop(0)
+    response = response.drop(1)
     opt_model.fit(X=train_data, y=response)
     return opt_model
 
@@ -45,6 +48,7 @@ def predict(model, newdata):
 
 def insert_pred(prediction, id):
     permit = Permit.query.get(id)
+    print "predicting " + str(permit)
     permit.prediction = prediction
     db.session.add(permit)
     db.session.commit()
@@ -53,7 +57,7 @@ def insert_pred(prediction, id):
 def train(data):
     # Gen response field, open/closed case indices
     response = process.gen_response(data=data)
-    train_idx, open_idx = open_closed_split(data)
+    train_idx, open_idx = process.open_closed_split(data)
     # Construct Design Matrix
     design_matrix = process.engineer_features(data=data)
     # Split design matrix into currently open and training data
