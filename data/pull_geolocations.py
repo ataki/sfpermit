@@ -31,3 +31,5 @@ while Permit.query.filter(Permit.address == None).count() != 0:
 f = open("./data/error_project_names.txt", "w")
 f.write("\n".join(errors))
 f.close()
+
+print "Done pulling geolocations"
