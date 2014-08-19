@@ -1,9 +1,9 @@
 define(function(require) {
 	return {
-	  "APIKEY": "5cbde763788f4de082e253d8d77af655",
+	  "APIKEY": "pk.eyJ1Ijoic2ZkYyIsImEiOiJaTlhyNkpZIn0.LyaEogTEViFAPM9tpNaExQ",
 	  "API_ENDPOINT_PREFIX": "/api/v1",
       "DEFAULT_MAP_ZOOM": 16,
-      "MAPBOX_MAP_ID": "jzheng.j0k4g9b5",
+      "MAPBOX_MAP_ID": "sfdc.j9a2pn7o",
       "TEMPLATE_DIR": "/partials"
 	}
 })
