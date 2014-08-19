@@ -87,7 +87,7 @@ class Permit(db.Model):
     total_records_by_case = db.Column(db.Integer)
     project_name = db.Column(db.String(256))
     net_units = db.Column(db.Integer)
-    block_lot = db.Column(db.Integer)
+    block_lot = db.Column(db.String(16))
     min_filed = db.Column(db.DateTime)
     max_action = db.Column(db.DateTime)
     allowed_height = db.Column(db.Float)
@@ -96,7 +96,7 @@ class Permit(db.Model):
     case_decision = db.Column(db.Enum(*['Cancelled', 'Approved', 'CEQA', 'Withdrawn', 'Disapproved', ''], name="case_decision"))
     q4_report_status = db.Column(db.String(64))
     last_planning_suffix = db.Column(db.String(16))
-    last_planning_action = db.Column(db.String(16))
+    last_planning_action = db.Column(db.String(64))
     days = db.Column(db.Integer)
     er_complete = db.Column(db.Integer)
     er_interim = db.Column(db.Integer)
@@ -131,7 +131,7 @@ class Permit(db.Model):
     filing_year = db.Column(db.Integer)
     action_year = db.Column(db.Integer)
     should_be = db.Column(db.String(64))
-    reason = db.Column(db.String(64))
+    reason = db.Column(db.String(256))
     project_size_class = db.Column(db.Enum(*['Small', 'Medium', 'Large'], name="project_class_size"))
 
     # Own, augmented fields
@@ -148,22 +148,24 @@ class StagedPermit(db.Model):
     """Batches updates to the model. Periodic migration
     from this table into the original table."""
 
+    __tablename__ = 'sfp_staged_permit'
+
     # Original fields
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     case_number = db.Column(db.String(16))
     total_records_by_case = db.Column(db.Integer)
     project_name = db.Column(db.String(256))
     net_units = db.Column(db.Integer)
-    block_lot = db.Column(db.Integer)
+    block_lot = db.Column(db.String(16))
     min_filed = db.Column(db.DateTime)
     max_action = db.Column(db.DateTime)
     allowed_height = db.Column(db.Float)
     plan_area = db.Column(db.Integer)
     case_decision_date = db.Column(db.DateTime)
-    case_decision = db.Column(db.String(16))
+    case_decision = db.Column(db.Enum(*['Cancelled', 'Approved', 'CEQA', 'Withdrawn', 'Disapproved', ''], name="case_decision"))
     q4_report_status = db.Column(db.String(64))
     last_planning_suffix = db.Column(db.String(16))
-    last_planning_action = db.Column(db.String(16))
+    last_planning_action = db.Column(db.String(64))
     days = db.Column(db.Integer)
     er_complete = db.Column(db.Integer)
     er_interim = db.Column(db.Integer)
@@ -193,13 +195,13 @@ class StagedPermit(db.Model):
     blocklot_in_q4_report = db.Column(db.Integer)
     in_q4_report = db.Column(db.Integer)
     missing_data = db.Column(db.Integer)
-    final_status = db.Column(db.String(64))
+    final_status = db.Column(db.Enum(*['Cancelled', 'Open', 'Approved'], name="final_status"))
     case_year = db.Column(db.Integer)
     filing_year = db.Column(db.Integer)
     action_year = db.Column(db.Integer)
     should_be = db.Column(db.String(64))
-    reason = db.Column(db.String(64))
-    project_size_class = db.Column(db.String(16))
+    reason = db.Column(db.String(256))
+    project_size_class = db.Column(db.Enum(*['Small', 'Medium', 'Large'], name="project_class_size"))
 
     # Own, augmented fields
     latitude = db.Column(db.Float)
