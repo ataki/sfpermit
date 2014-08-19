@@ -5,7 +5,7 @@
 DEBUG = True
 SECRET_KEY = '1234' # make sure to change this
 
-SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://localhost:''@localhost/test'
+SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://localhost:''@localhost/bayesimpact'
 
 LESS_CONFIG = {
   "SRC": "static/less",
@@ -15,12 +15,13 @@ LESS_CONFIG = {
 }
 
 # ------- Flask Security ----------
-# SECURITY_PASSWORD_HASH = 'pbkdf2_sha512'
-# SECURITY_PASSWORD_SALT = '123'
+SECURITY_PASSWORD_HASH = 'pbkdf2_sha512'
+SECURITY_PASSWORD_SALT = '123'
 SECURITY_REGISTERABLE = True
 DEFAULT_MAIL_SENDER = "jim32990@gmail.com"
 SECURITY_CONFIRMABLE = False
 SECURITY_RECOVERABLE = True
+SECURITY_REGISTERABLE = False
 
 # ------- Flask Email ----------
 MAIL_SERVER = 'smtp.gmail.com'
