@@ -3,7 +3,7 @@
 ####################
 import os
 
-DEBUG = True
+DEBUG = False
 SECRET_KEY = '1234' # make sure to change this
 
 SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://localhost:''@localhost/bayesimpact'

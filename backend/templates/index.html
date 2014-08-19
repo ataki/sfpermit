@@ -4,7 +4,11 @@
     <link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="index.css" type="text/css" />
+    {% if config.DEBUG %}
     <script data-main="app" src="bower_components/requirejs/require.js"></script>
+    {% else %}
+    <script src="dist/app.build.js"></script>
+    {% endif %}
   </head>
   <body>
     {% with messages = get_flashed_messages() %}
