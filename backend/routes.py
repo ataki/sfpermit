@@ -58,12 +58,11 @@ def basic_pages():
 
 
 @app.route('/edit/<int:permit_id>', methods=['GET', 'POST'])
+@login_required
 def edit_permit(permit_id):
     PermitForm = model_form(Permit, Form)
     model = Permit.query.get(permit_id)
     form = PermitForm(request.form, model)
-
-    print request.method
     if request.method == "POST" and form.validate():
         form.populate_obj(model)
         db.session.add(model)

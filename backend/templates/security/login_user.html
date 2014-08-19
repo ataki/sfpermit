@@ -1,0 +1,47 @@
+<html>
+<head>
+  <title>Bayes Impact: SF Permits</title>
+  <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="styles/external.css">
+</head>
+<body>
+<div class="container">
+<br/>
+<div class="row">
+  <div class="col-sm-6 col-sm-offset-3 well">
+    <h2>
+      <img class="logo" src="/images/logo_dark.png" />
+    </h2>
+    <br/>
+    <br/>
+    {% from "security/_custom_macros.html" import render_field_with_errors, render_field %}
+      {%- with messages = get_flashed_messages(with_categories=true) -%}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-danger {{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {%- endwith %}
+      {% if current_user.is_authenticated() %}
+        <p>
+          Hi! You're logged in. <a href="/">Click to go to the main application.</a>
+          Or, <a href="{{ url_for('security.logout') }}">click to logout.</a>
+        </p>
+      {% else %}
+      <form class="form" action="{{ url_for_security('login') }}" method="POST" name="login_user_form">
+        {{ login_user_form.hidden_tag() }}
+        {{ render_field_with_errors(login_user_form.email, class_="form-control") }}
+        {{ render_field_with_errors(login_user_form.password, class_="form-control") }}
+        <br/>
+        {{ render_field(login_user_form.next, class_="form-control") }}
+        {{ render_field(login_user_form.submit, class_="form-control btn btn-success") }}
+      </form>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% block content %}
+{% endblock %}
+
+</body>

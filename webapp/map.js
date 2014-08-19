@@ -201,6 +201,13 @@ define(function(require) {
     });
 
 
+    setTimeout(function() {
+        $(".flashes").fadeOut('slow', function() {
+            $(this).remove();
+        });
+    }, 2000);
+
+
     // Exports
     return {
         'setup': setup

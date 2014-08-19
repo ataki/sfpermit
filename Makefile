@@ -1,15 +1,20 @@
 db:
-	@echo "Dropping previous db"
-	mysql test -e "drop table if exists sfp_permit";
 	@echo "Set up the database..."
 	@python run.py create_db
-	mysql test < data/import.sql
+	@python -m data.import
 	python -m data.pull_geolocations
+	@echo "##########################"
 	@echo "Done creating db"
 
 serve:
 	@echo "Start test server..."
 	@./run.py server
+
+assets:
+	@echo "Optimizing with r.js..."
+	@cd webapp && r.js -o build.js
+	@echo "##########################"
+	@echo "Done. Output in webapp/dist/app.build.js"
 
 dev:
 	@echo "Recompile CSS dynamically..."
