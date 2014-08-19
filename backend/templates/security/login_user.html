@@ -1,7 +1,11 @@
 <html>
 <head>
   <title>Bayes Impact: SF Permits</title>
+  {% if config.DEBUG %}
   <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+  {% else %}
+  <link rel="stylesheet" type="text/css" href="dist/bootstrap.min.css">
+  {% endif %}
   <link rel="stylesheet" type="text/css" href="styles/external.css">
 </head>
 <body>
