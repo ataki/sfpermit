@@ -12,7 +12,7 @@ serve:
 
 assets:
 	@echo "Optimizing with r.js..."
-	r.js -o webapp/build.js
+	@cd webapp && r.js -o build.js
 	@echo "##########################"
 	@echo "Done. Output in webapp/dist/app.build.js"
 
