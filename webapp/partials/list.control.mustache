@@ -8,11 +8,25 @@
 <ul>
     {{#collection}}
     <li class="model-row" data-id="{{id}}">
-        <a href="{{url}}">
-            <strong>{{name}}</strong><br/>
-            <span>{{days}} old</span>, 
-            <span>{{net_units}} number of units</span>,
-            <span>{{prediction}} chance of success</span>
+        <a href="#">
+            {{#isApproved}}
+            <span class="label label-success">A</span>
+            {{/isApproved}}
+            {{#isCancelled}}
+            <span class="label label-default">C</span>
+            {{/isCancelled}}
+            {{#isOpen}}
+            <span class="label label-primary">O</span>
+            {{/isOpen}}
+            &nbsp;&nbsp;
+            <strong>{{project_name}}</strong>
+            <br/>
+            <span>{{days}} days old</span>, 
+            <span>{{net_units}} units</span>
+            {{#prediction}}
+            ,<br/>
+            <span><b>{{prediction}}</b> chance of success</span>
+            {{/prediction}}
         </a>
     </li>
     {{/collection}}

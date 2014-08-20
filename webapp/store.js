@@ -28,7 +28,6 @@ define(function(require) {
 
     function square(x) { return x * x; }
 
-
     function distanceMeasure(addr) {
         var lat = addr.get("latitude")
             , lng = addr.get("longitude");
@@ -47,31 +46,6 @@ define(function(require) {
                 square(lng - m.longitude));
         }
     }
-
-
-    var PermitCollection = Backbone.Collection.extend({
-        url: endpoint("permit"),
-        parse: function(data) {
-            var results = _.map(data, function(entry) {
-                if (entry.case_decision === "Approved") {
-                    entry.case_decision = "success";
-                } else if (entry.case_decision === "Withdrawn" ||
-                           entry.case_decision === "Cancelled" ||
-                           entry.case_decision === "Disapproved") {
-                    entry.case_decision = "fail";
-                } else if (entry.case_decision === "") {
-                    entry.case_decision = "neutral";
-                } else if (entry.case_decision === "CEQA") {
-                    entry.case_decision = "info";
-                }
-                return entry;
-            });
-            return results;
-        },
-        getNearby: function(addr) {
-            return this.chain().sortBy(distanceMetric(addr));
-        }
-    });
 
     var SearchResults = Backbone.Collection.extend({
         url: endpoint("search") 
@@ -92,7 +66,6 @@ define(function(require) {
 
     var Permit = Backbone.Model.extend({
         validate: function() {
-            console.log(this.getAddress());
             return !isNaN(this.get("latitude")) && !isNaN(this.get("longitude"));
         },
         getAddress: function() {
@@ -100,6 +73,10 @@ define(function(require) {
         },
         getColor: function() {
             var prediction = this.get("prediction");
+            var final_status = this.get("final_status");
+            if (final_status != 'Open') {
+                return "gray";
+            }
             if (0 < prediction && prediction <= 0.3) {
                 return "red";
             } else if (0.3 < prediction && prediction <= 0.7) {
@@ -116,7 +93,7 @@ define(function(require) {
             var output = (range[1] - range[0]) * net_units / domain[1] + range[0]
             return output;
         },
-        determinePredictionLevel: function() {
+        getPredictionLevel: function() {
             var level = this.get("prediction");
             if (level > 0.6) {
                 return "success";
@@ -128,13 +105,16 @@ define(function(require) {
                 return "danger";
             }
         },
-        determineDaysLevel: function() {
+        getDaysLevel: function() {
             var days = this.get("days");
-            if (days > 300) {
+            if (days > 365 * 3.5) {
                 return "danger";
             }
-            else if (days > 100) {
+            else if (days > 365 * 2) {
                 return "warning";
+            }
+            else if (days < 0) {
+                return "default";
             }
             else {
                 return "success";
@@ -146,12 +126,43 @@ define(function(require) {
             else 
                 return 0.00;
         },
-        toJSON: function() {
-           var attributes = _.clone(this.attributes);
-           attributes.prediction_level = this.determinePredictionLevel();
-           attributes.days_level = this.determineDaysLevel(); 
-           attributes.prediction = this.roundPrediction(attributes.prediction)
-           return attributes;
+        toJSON: function() { 
+            var attributes = _.clone(this.attributes);
+            attributes.prediction_level = this.getPredictionLevel();
+            attributes.days_level = this.getDaysLevel(); 
+            attributes.prediction = this.roundPrediction(attributes.prediction)
+            attributes.isOpen = (attributes.final_status == 'Open');
+            attributes.isCancelled = (attributes.final_status == 'Cancelled');
+            attributes.isApproved = (attributes.final_status == 'Approved');
+            if (attributes.final_status == null) {
+                attributes.final_status = 'Unknown';
+            }
+            return attributes;
+        }
+    });
+
+    var PermitCollection = Backbone.Collection.extend({
+        url: endpoint("permit"),
+        model: Permit,
+        parse: function(data) {
+            var results = _.map(data, function(entry) {
+                if (entry.case_decision === "Approved") {
+                    entry.case_decision = "success";
+                } else if (entry.case_decision === "Withdrawn" ||
+                           entry.case_decision === "Cancelled" ||
+                           entry.case_decision === "Disapproved") {
+                    entry.case_decision = "fail";
+                } else if (entry.case_decision === "") {
+                    entry.case_decision = "neutral";
+                } else if (entry.case_decision === "CEQA") {
+                    entry.case_decision = "info";
+                }
+                return entry;
+            });
+            return results;
+        },
+        getNearby: function(addr) {
+            return this.chain().sortBy(distanceMetric(addr));
         }
     });
 
