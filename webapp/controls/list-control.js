@@ -13,6 +13,7 @@ define(function(require) {
     Store = require("store");
 
     var CurrentAddress = Store.CurrentAddress;
+    var PermitCollection = Store.PermitCollection;
 
     var List = Backbone.View.extend({
         id: "list-view",
@@ -75,7 +76,10 @@ define(function(require) {
         },
         render: function(json) {
             var $el = this.$el;
-            this._json = json;
+            var permits = new PermitCollection(json);
+            this._json = permits.map(function(m) { return m.toJSON(); });
+            var _json = this._json;
+            console.log(_json);
             Templates.get("list.control").done(function(template) {
                 _.each(json, function(d) {
                     if (!_.has(d, "url")) {
@@ -85,7 +89,7 @@ define(function(require) {
                 });
                 var html = Mustache.render(template, {
                     collection_name: "Permits Nearest You",
-                    collection: json,
+                    collection: _json,
                     sort_proximity: (this.curSortBy == "proximity"),
                     sort_risk: (this.curSortBy == "risk"),
                     sort_units: (this.curSortBy == "units")
