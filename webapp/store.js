@@ -121,11 +121,11 @@ define(function(require) {
             }
         },
         roundPrediction: function(pred) {
-            console.log("pred: " + pred);
-            if (pred)
+            if (typeof pred === "number") {
                 return pred.toFixed(2);
-            else 
+            } else {
                 return 0.00;
+            }
         },
         toJSON: function() { 
             var attributes = _.clone(this.attributes);
