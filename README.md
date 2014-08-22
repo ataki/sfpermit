@@ -15,7 +15,7 @@ You should have virtualenv installed. If not, do:
 
 To create a virtual environment, run in project root:
 
-    virtualenv venv
+	virtualenv venv
 
 Activate using:
 
@@ -27,11 +27,11 @@ Finally, to make sure you're up to date with project dependencies, do:
 
 and
 
-  cd webapp
+	cd webapp
 
-  npm install
+	npm install
 
-  bower install
+	bower install
 
 ## Populating the database
 
@@ -39,7 +39,7 @@ This assumes you have mysql. Install, preferably through brew.
 
 Run
 
-    make db
+	make db
 
 to create the test database from the dataset in /data.
 
@@ -57,6 +57,6 @@ to run the server. Go to ```http://localhost:5000``` to see the page.
 
 Run
 
-  node webapp/lesswatcher.js
+	node webapp/lesswatcher.js
 
 to create the CSS files and watch for LESS changes.
