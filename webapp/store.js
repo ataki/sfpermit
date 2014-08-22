@@ -121,6 +121,7 @@ define(function(require) {
             }
         },
         roundPrediction: function(pred) {
+            console.log("pred: " + pred);
             if (pred)
                 return pred.toFixed(2);
             else 
