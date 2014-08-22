@@ -205,10 +205,7 @@ define(function(require) {
         }
     });
 
-    setTimeout(function() {
-        Backbone.trigger("show.about");
-    }, 1500);
-
+    Backbone.trigger("show.about");
 
     setTimeout(function() {
         $(".flashes").fadeOut('slow', function() {
