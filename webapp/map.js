@@ -207,7 +207,7 @@ define(function(require) {
 
     setTimeout(function() {
         Backbone.trigger("show.about");
-    }, 500);
+    }, 1500);
 
 
     setTimeout(function() {
