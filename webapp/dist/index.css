@@ -160,16 +160,29 @@ button-btn-tertiary .badge {
 .inline-heading {
   display: inline-block;
 }
+input,
+textarea {
+  font-family: 'Open Sans';
+}
+.s-h3 {
+  font-size: 16px;
+}
+.text-gray {
+  color: #555555;
+}
 /* Map Container */
 #map {
   width: 100%;
   height: 100%;
 }
-/* Mixins */
-/* Leaflet overrides */
+/* Section::Mixins */
+/* Section::Leaflet overrides */
 .leaflet-container {
   font-family: "Open Sans", sans-serif;
   font-size: 14px;
+}
+.leaflet-container a {
+  text-decoration: none;
 }
 .leaflet-bar {
   border-radius: 0px;
@@ -188,9 +201,10 @@ button-btn-tertiary .badge {
   border-bottom-right-radius: 0px;
 }
 .leaflet-popup-content-wrapper {
-  border-radius: 1px !important;
+  border-radius: 5px !important;
+  box-shadow: none;
 }
-/* Controls */
+/* Section::Controls */
 .indicator-success {
   background-color: #46a546;
 }
@@ -252,6 +266,17 @@ button-btn-tertiary .badge {
 .map-control-inner-padding {
   padding: 0 20px;
 }
+.no-input-default-style {
+  outline: 0;
+  border: 0;
+  background: none;
+  -webkit-appearance: none;
+  box-shadow: none !important;
+  line-height: normal;
+}
+.no-input-default-style:focus {
+  outline: 0;
+}
 /*#master-control-view {
 	.secondary-colors();	
 
@@ -291,41 +316,105 @@ button-btn-tertiary .badge {
 		}
 	}
 }*/
-#search-control-view {
-  left: 0px;
-  top: 0px;
+.popup {
+  line-height: 24px;
+}
+/* Section::Menu */
+#menu-control {
+  top: 0;
+  left: 0;
   position: fixed;
   font-size: 12px;
   width: 100%;
-  height: 40px;
+  height: 44px;
   background: #3c4e5a;
   padding: 0 10px;
   margin: 0;
 }
-#search-control-view input {
-  height: 40px;
+#menu-control input {
+  height: 44px;
   border: 0;
   display: block;
   font-size: 14px;
   font-family: "Open Sans", sans-serif;
   outline: none;
 }
-.brand-bar {
-  margin-top: 30px;
-  height: 45px;
+#menu-control .brand-bar {
+  height: 44px;
+  position: relative;
 }
-.brand-bar ul {
-  background: #FFF;
+#menu-control .brand-bar ul {
+  margin: 0;
+  height: 44px;
+  position: relative;
 }
-.brand-bar ul li {
-  width: 60px;
+#menu-control .brand-bar ul li {
+  padding-top: 11px;
+  width: 88px;
+  height: 44px;
   text-align: center;
-  vertical-align: middle;
-  display: inline-block;
-  border-right: 1px solid #FFF;
+  display: block;
+  float: left;
+  border-right: 1px solid rgba(255, 255, 255, 0.25);
 }
-.brand-bar ul .logo {
-  font-variant: small-caps;
+#menu-control .brand-bar ul li a {
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+}
+#menu-control .brand-bar ul li.ext {
+  padding: 11px;
+  text-align: center;
+  width: auto;
+}
+#menu-control .brand-bar ul li.ext-2 {
+  width: 176px;
+}
+#menu-control .brand-bar ul li.ext-3 {
+  width: 220px;
+}
+#menu-control .brand-bar ul li.ext-4 {
+  width: 352px;
+}
+#menu-control .brand-bar ul li.ext-6 {
+  width: 528px;
+}
+#menu-control .brand-bar ul li.logo-container {
+  padding-top: 0;
+  height: 44px;
+  width: 160px;
+}
+#menu-control .brand-bar ul .logo {
+  margin-top: 11px;
+  height: 22px;
+}
+/* Section::Search */
+#search-bar-wrapper {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  margin-top: 40px;
+  padding: 40px 32px;
+  background: rgba(255, 255, 255, 0.9);
+}
+.search-prefix {
+  font-size: 24px;
+  color: #CCC;
+}
+#search-bar {
+  font-size: 40px;
+}
+#search-results-list {
+  width: 250px;
+  overflow: scroll;
+  height: 100%;
+}
+#search-results-list li {
+  height: 20px;
+  width: 250px;
+  padding: 5px 7px;
 }
 #help-control-view {
   background-color: #ffffff;
@@ -377,29 +466,85 @@ button-btn-tertiary .badge {
   width: 450px;
   margin-left: 20px;
 }
-/* Generic Classes */
-.control-generic-list {
-  cursor: pointer;
-  margin-bottom: 10px;
+/* Section::List View */
+.leaflet-container #list-view h1,
+.leaflet-container #list-view h2,
+.leaflet-container #list-view h3 {
+  font-size: 28px;
+  line-height: normal;
+  margin: 0 0 12px 0;
+}
+#list-view {
+  position: fixed;
+  top: 0;
+  right: 0;
+  margin: 0;
+  height: 100%;
+  min-width: 250px;
+  font-size: 13px;
+}
+#list-view .head {
+  height: 54px;
+  padding: 10px;
+  border-bottom: 1px solid #efefef;
+}
+#list-view .head span {
+  margin-right: 10px;
+}
+#list-view ul {
   overflow: scroll;
-  max-height: 500px;
+  margin: 0;
+  height: 100%;
 }
-.control-generic-list li {
+#list-view li {
+  text-decoration: none;
+  color: #333;
   vertical-align: middle;
-  line-height: 28px;
-  padding-top: 7px;
-  padding-bottom: 7px;
+  line-height: 32px;
+  padding: 0 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #efefef;
 }
-.control-generic-list li:hover {
+#list-view li:hover {
   background-color: #eeeeee;
 }
-.control-generic-list li:not(:last-child) {
+#list-view li:not(:last-child) {
   border-bottom: 1px solid #eeeeee;
+}
+#list-view .sort-by {
+  cursor: pointer;
+}
+/* Section::About Control */
+#about-control-view {
+  padding: 12px 32px 24px;
+  position: fixed;
+  margin: 200px 25%;
+  width: 50%;
+}
+/* Generic Classes */
+.paper {
+  background: white;
+}
+.flashes {
+  position: fixed;
+  width: 140px;
+  height: 50px;
+  margin: auto;
+  z-index: 9999;
+  padding: 7px 10px;
+  background-color: #fff233;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+  -webkit-box-shadow: 1px 2px 5px #eeeeee;
+  -moz-box-shadow: 1px 2px 5px #eeeeee;
+  box-shadow: 1px 2px 5px #eeeeee;
 }
 .global-alert {
   position: fixed;
+  bottom: 0;
   width: 140px;
-  height: 20px;
+  height: 50px;
   left: 50%;
   z-index: 9999;
   padding: 7px 10px;
@@ -1748,4 +1893,7 @@ button-btn-tertiary .badge {
 }
 .fa-plus-square-o:before {
   content: "\f196";
+}
+.edit-permit-form-container {
+  padding: 10px 0;
 }
