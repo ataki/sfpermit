@@ -19,3 +19,10 @@ assets:
 dev:
 	@echo "Recompile CSS dynamically..."
 	@node webapp/lesswatcher.js
+
+deploy:
+	make assets
+	cp webapp/index.css dist/index.css
+	git add webapp/dist
+	git commit -m "Update assets for deployment"
+	git push heroku master
