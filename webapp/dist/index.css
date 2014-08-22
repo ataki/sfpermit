@@ -514,6 +514,13 @@ textarea {
 #list-view .sort-by {
   cursor: pointer;
 }
+/* Section::About Control */
+#about-control-view {
+  padding: 12px 32px 24px;
+  position: fixed;
+  margin: 200px 25%;
+  width: 50%;
+}
 /* Generic Classes */
 .paper {
   background: white;
