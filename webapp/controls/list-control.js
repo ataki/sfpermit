@@ -57,7 +57,13 @@ define(function(require) {
             this.highlightSortBy();
         },
         sortByRisk: function() {
-            var distanceMeasure = function(d) { return d.prediction; }
+            var distanceMeasure = function(d) { 
+                if (d.final_status != "Open") {
+                    return 1.1;
+                } else { 
+                    return d.prediction; 
+                }
+            }
             var newJSON = _.sortBy(this._json, distanceMeasure);
             _.each(newJSON, function(d) {
                 d.sort_by_value = distanceMeasure(d);

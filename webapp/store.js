@@ -137,6 +137,9 @@ define(function(require) {
             if (attributes.final_status == null) {
                 attributes.final_status = 'Unknown';
             }
+            if (attributes.days < 0) {
+                attributes.days = 0;
+            }
             return attributes;
         }
     });
