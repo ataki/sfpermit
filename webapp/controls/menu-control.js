@@ -17,7 +17,8 @@ define(function(require) {
         id: 'menu-control',
         events: {
             'click .target-search': 'showSearch',
-            'click .target-permits': 'showPermits'
+            'click .target-permits': 'showPermits',
+            'click .target-about': 'showAbout'
         },
         initialize: function() {
             _.bindAll(this, "showSearch");
@@ -48,6 +49,9 @@ define(function(require) {
         },
         showPermits: function(e) {
             Backbone.trigger("show.list", Store.get("permits"));
+        },
+        showAbout: function(e) {
+            Backbone.trigger("show.about");
         },
         updateCurrentAddress: function(lat, lng) {
             $(".latitude").text(lat.toFixed(2))

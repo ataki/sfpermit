@@ -15,6 +15,7 @@ define(function(require) {
     var MenuControl = require("controls/menu-control");
     var SearchControl = require("controls/search-control");
     var ListControl = require("controls/list-control");
+    var AboutControl = require("controls/about-control");
     var GlobalAlert = require("utils/global-alert");
 
     // leaflet map
@@ -34,7 +35,8 @@ define(function(require) {
     var ctrls = {
       'search': new SearchControl(),
       'menu': new MenuControl(),
-      'list': new ListControl()
+      'list': new ListControl(),
+      'about': new AboutControl()
     };
 
     // controls that are always active
@@ -131,13 +133,8 @@ define(function(require) {
 
         Map.addControl(L.control.zoom({'position': 'bottomleft'}))
 
-        // Backbone.on('show.help', function() {
-        //     hidePanelCtrls();
-        //     ctrls.help.showView();
-        // });
-        
         Backbone.on('show.search', function() {
-            ctrls.list.hideView();
+            hidePanelCtrls();
             ctrls.search.showView();
             disableMapInteractions();
         });
@@ -147,11 +144,19 @@ define(function(require) {
             enableMapInteractions();
         });
 
+        Backbone.on('show.about', function() {
+            hidePanelCtrls();
+            ctrls.about.showView();
+        });
+
+        Backbone.on('hide.about', function() {
+            ctrls.about.hideView();
+        });
+
         Backbone.on('show.list', function(data) {
             if (!data) {
                 throw new Error("list view needs data!");
             } 
-            //disableMapInteractions();
             ctrls.search.hideView();
             ctrls.list.updateViewData(data);
             ctrls.list.showView();
@@ -199,6 +204,10 @@ define(function(require) {
             Backbone.trigger("list.hide");
         }
     });
+
+    setTimeout(function() {
+        Backbone.trigger("show.about");
+    }, 500);
 
 
     setTimeout(function() {

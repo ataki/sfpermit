@@ -24,7 +24,7 @@ watch.watchTree(getPath(config.dir), function (f, curr, prev) {
 
     cmd.on("exit", function(code) {
         if (code == 0) {
-            console.log("Recompiled");
+            console.log("Recompiled at " + new Date());
         }
     });
 });

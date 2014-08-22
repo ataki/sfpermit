@@ -79,7 +79,6 @@ define(function(require) {
             var permits = new PermitCollection(json);
             this._json = permits.map(function(m) { return m.toJSON(); });
             var _json = this._json;
-            console.log(_json);
             Templates.get("list.control").done(function(template) {
                 _.each(json, function(d) {
                     if (!_.has(d, "url")) {
