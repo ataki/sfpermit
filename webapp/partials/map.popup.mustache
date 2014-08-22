@@ -14,7 +14,12 @@
         {{/isApproved}}
     {{/isOpen}}
     <br/>
+    {{#days}}
     It has been active for <strong><span class="text-{{days_level}}">{{days}}</span> days</strong><br/>
+    {{/days}}
+    {{^days}}
+    It has been active for an unknown number of days 
+    {{/days}}
     and has {{net_units}} net units.<br/>
     </p>
     <p>
