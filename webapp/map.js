@@ -99,10 +99,18 @@ define(function(require) {
         // Disable scrolling to allow for scrolling on panels
         Map.scrollWheelZoom.disable();
 
-        L.tileLayer(generateSDKUrl(key, mapId), {
+        var tileLayer = L.tileLayer(generateSDKUrl(key, mapId), {
             attribution: 'Map data &copy;',
             maxZoom: 18
         }).addTo(Map);
+
+        var firstTime = true;
+        tileLayer.on("load", function() {
+            if (firstTime) {
+              Backbone.trigger("show.about");
+              firstTime = false;
+            }
+        });
 
         Templates.get("map.popup").done(function(template) {
             _.each(options.data, function(d) {
@@ -180,7 +188,6 @@ define(function(require) {
             var addr = address.toMapView();
             Map.panTo(addr);
             Map.setZoom(address.get("zoom") || config.DEFAULT_MAP_ZOOM);
-            console.log(address.toMapView());
             CurrentAddress.set({
                 latitude: address.get("latitude"),
                 longitude: address.get("longitude")
@@ -204,8 +211,6 @@ define(function(require) {
             Backbone.trigger("list.hide");
         }
     });
-
-    Backbone.trigger("show.about");
 
     setTimeout(function() {
         $(".flashes").fadeOut('slow', function() {
