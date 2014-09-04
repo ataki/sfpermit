@@ -170,6 +170,10 @@ define(function(require) {
         }
     });
 
+    var LogCollection = Backbone.Collection.extend({
+        url: endpoint("permit_update_log")
+    });
+
     // singleton
     var CurrentAddressSingleton = new Address({
         latitude: 0,
