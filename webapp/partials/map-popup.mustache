@@ -1,0 +1,29 @@
+<div class="popup">
+    <h3><strong>{{project_name}}</strong></h3>
+    <div><i class="fa fa-map-marker"></i> <span class="text-gray">{{address}}</span></div>
+    <p> 
+    {{#isOpen}}
+        This permit has a <span class="text-{{prediction_level}}">{{prediction}} chance of approval</span>
+    {{/isOpen}}
+    {{^isOpen}}
+        {{#isCancelled}}
+        This permit's status is <span class="label label-default">{{final_status}}</span>
+        {{/isCancelled}}
+        {{#isApproved}}
+        This permit's status is <span class="label label-success">{{final_status}}</span>
+        {{/isApproved}}
+    {{/isOpen}}
+    <br/>
+    {{#days}}
+    It has been active for <strong><span class="text-{{days_level}}">{{days}}</span> days</strong><br/>
+    {{/days}}
+    {{^days}}
+    It has been active for an unknown number of days 
+    {{/days}}
+    and has {{net_units}} net units.<br/>
+    </p>
+    <p>
+        <a href="/edit/{{id}}" class="btn" target="_blank">Edit</a>
+        <a href="#" class="btn">View Detail</a>
+    </p>
+</div>
