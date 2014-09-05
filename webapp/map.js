@@ -11,11 +11,6 @@ define(function(require) {
     var L = require("leaflet");
     var Store = require("store");
 
-    var HelpControl = require("controls/help-control");
-    var MenuControl = require("controls/menu-control");
-    var SearchControl = require("controls/search-control");
-    var ListControl = require("controls/list-control");
-    var AboutControl = require("controls/about-control");
     var GlobalAlert = require("utils/global-alert");
 
     // leaflet map
@@ -32,15 +27,10 @@ define(function(require) {
     var globalEditAlert = new GlobalAlert();
 
     // map of all leaflet controls
-    var ctrls = {
-      'search': new SearchControl(),
-      'menu': new MenuControl(),
-      'list': new ListControl(),
-      'about': new AboutControl()
-    };
+    var ctrls = {};
 
     // controls that are always active
-    var activeControls = ['menu'];
+    var activeControls = [];
 
     // global controls
     function hidePanelCtrls() {
@@ -89,8 +79,8 @@ define(function(require) {
             var initialView = CurrentAddress.toMapView();
             Map.setView(initialView, 16);
         } else {
+            // create "global" map
             CurrentAddress.once("change", function(address) {
-                // create "global" map
                 var initialView = CurrentAddress.toMapView();
                 Map.setView(initialView, 16);
             });
@@ -136,45 +126,8 @@ define(function(require) {
             Map.addControl(ctrl);
         })
 
-        // hide panels initially
-        hidePanelCtrls();   
-
+        // need to add zoom manually
         Map.addControl(L.control.zoom({'position': 'bottomleft'}))
-
-        Backbone.on('show.search', function() {
-            hidePanelCtrls();
-            ctrls.search.showView();
-            disableMapInteractions();
-        });
-
-        Backbone.on('hide.search', function() {
-            ctrls.search.hideView();
-            enableMapInteractions();
-        });
-
-        Backbone.on('show.about', function() {
-            hidePanelCtrls();
-            ctrls.about.showView();
-        });
-
-        Backbone.on('hide.about', function() {
-            ctrls.about.hideView();
-        });
-
-        Backbone.on('show.list', function(data) {
-            if (!data) {
-                throw new Error("list view needs data!");
-            } 
-            ctrls.search.hideView();
-            ctrls.list.updateViewData(data);
-            ctrls.list.showView();
-        });
-
-        Backbone.on('hide.list', function() {
-            enableMapInteractions();
-            ctrls.list.cleanUpView();
-            ctrls.list.hideView();
-        });
 
         Backbone.on('map.interaction.disable', function() {
             disableMapInteractions();
@@ -203,14 +156,6 @@ define(function(require) {
             }
         });
     };
-
-    // hide all controls when esc key is pressed
-    $(document).on("keyup", function(e) {
-        if (e.which == 27) {
-            Backbone.trigger("hide.search");
-            Backbone.trigger("list.hide");
-        }
-    });
 
     setTimeout(function() {
         $(".flashes").fadeOut('slow', function() {

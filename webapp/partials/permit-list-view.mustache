@@ -1,0 +1,36 @@
+<div class="head">
+  <span class="btn-group s-h3">Sort by&nbsp;&nbsp;</span>
+  <div class="btn-group">
+    <button type="button" class="btn btn-default sort-by proximity">Proximity</button>
+    <button type="button" class="btn btn-default sort-by risk">Risk</button>
+    <button type="button" class="btn btn-default sort-by units">Net Units</button>
+  </div>
+  <a class="close">&times;</a> 
+</div>
+<ul class="model-list">
+    {{#collection}}
+    <li class="model-row" data-id="{{id}}">
+        <a href="#">
+            {{#Approved}}
+            <span class="label label-success">A</span>
+            {{/Approved}}
+            {{#Cancelled}}
+            <span class="label label-default">C</span>
+            {{/Cancelled}}
+            {{#Open}}
+            <span class="label label-primary">O</span>
+            {{/Open}}
+            &nbsp;&nbsp;
+            <strong>{{project_name}}</strong>
+            &nbsp;&nbsp;
+            <span>{{days}} days old</span>, 
+            <span>{{net_units}} units</span>
+            {{#prediction}}
+            ,<br/>
+            <span><b>{{prediction}}</b> chance of success</span>
+            {{/prediction}}
+        </a>
+        <br/>
+    </li>
+    {{/collection}}
+</ul>

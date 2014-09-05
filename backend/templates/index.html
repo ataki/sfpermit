@@ -23,7 +23,48 @@
         </ul>
       {% endif %}
     {% endwith %}
+    <nav id="header" class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#"><img class="logo" height="25px" src="/images/logo_dark.png" /></a>
+        </div>
+        <form class="navbar-form navbar-left hidden-xs" role="search">
+          <div class="form-group">
+            <input type="text" class="form-control" placeholder="Search">
+          </div>
+        </form>
+        <ul class="nav navbar-nav">
+          <li class="link-pad latitude"></li>
+          <li class="link-pad longitude"></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              {% if current_user.is_authenticated() %}
+                {{ current_user.username }} <span class="caret"></span>
+              {% else %}
+                Login In <i class="fa fa-login"></i>
+              {% endif %}
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              <li><a href="#">Action</a></li>
+              <li><a href="#">Another action</a></li>
+              <li><a href="#">Something else here</a></li>
+              <li class="divider"></li>
+              <li><a href="#">Separated link</a></li>
+            </ul>
+          </li>
+          <li><a href="#">Help</a></li>
+          <li><a href="#">About</a></li>
+        </ul>
+      </div>
+    </nav>
+
     <div id="map">
+    </div>
+    <div id="side">
+      <div class="child list"></div>
+      <div class="child detail"></div>
     </div>
   </body>
 </html>

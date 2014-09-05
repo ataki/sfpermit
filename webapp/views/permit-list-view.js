@@ -25,13 +25,13 @@ define(function(require) {
         curSortBy: "proximity",
         initialize: function(options) {
             // binds callback functions to View context
-            _.bindAll(this, "highlightSortBy", "sortByProximity", 
-                "sortByUnits", "showRow", "close", "refresh");
+            _.bindAll(this, "mini", "fullsize", "syncForm", "refresh", 
+                "render");
             this.query = {
                 data: {
-                    page: options.page || 1,
-                }
-                refresh: true
+                    page: options.page || 1
+                },
+                reset: true
             }
             this.collection = new PermitCollection();
             this.collection.on("reset", this.render);
@@ -52,12 +52,11 @@ define(function(require) {
         },
         render: function() {
             var $el = this.$el;
-            var json = this.collection.map(function(m) { 
-                return m.toJSON(); 
-            });
+            var json = this.collection.toJSON();
+            console.log(json);
             Templates.get("permit-list-view").done(function(template) {
                 var html = Mustache.render(template, {
-                    collection: _json
+                    collection: json
                 });
                 $el.html(html);
             });

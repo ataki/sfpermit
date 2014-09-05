@@ -7,6 +7,7 @@ define(function(require) {
     _ = require("underscore");
     Backbone = require("backbone");
     config = require("config");
+    moment = require("moment");
 
     // universal data
     var data = {};
@@ -21,9 +22,17 @@ define(function(require) {
 
     function setup() {}
 
-    // should be internal; expose for ease of prototyping
+    function formatDatetime(dt) {
+        return moment(dt).format('MMMM Do YYYY, h:mm:ss a');
+    }
+
+    // endpoint for API calls
     function endpoint(fragment) {
         return config.API_ENDPOINT_PREFIX + "/" + fragment
+    }
+
+    function googleStreetsViewImage(lat, lng, key) {
+        return "http://maps.googleapis.com/maps/api/streetview?size=200x200&location=" + lat + "," + lng + "&key=" + key;
     }
 
     function square(x) { return x * x; }
@@ -57,7 +66,9 @@ define(function(require) {
 
     var Address = Backbone.Model.extend({
         validate: function() {
-            return this.has("longitude") && this.has("latitude");
+            return this.has("longitude") && this.has("latitude")
+                && _.isNumber(this.get("latitude"))
+                && _.isNumber(this.get("longitude"));
         },
         toMapView: function() {
             return [this.get("latitude"), this.get("longitude")];
@@ -66,7 +77,8 @@ define(function(require) {
 
     var Permit = Backbone.Model.extend({
         validate: function() {
-            return !isNaN(this.get("latitude")) && !isNaN(this.get("longitude"));
+            return !isNaN(this.get("latitude")) && 
+                    !isNaN(this.get("longitude"));
         },
         getAddress: function() {
             return [this.get("latitude"), this.get("longitude")];
@@ -132,15 +144,17 @@ define(function(require) {
             attributes.prediction_level = this.getPredictionLevel();
             attributes.days_level = this.getDaysLevel(); 
             attributes.prediction = this.roundPrediction(attributes.prediction)
-            attributes.isOpen = (attributes.final_status == 'Open');
-            attributes.isCancelled = (attributes.final_status == 'Cancelled');
-            attributes.isApproved = (attributes.final_status == 'Approved');
             if (attributes.final_status == null) {
                 attributes.final_status = 'Unknown';
             }
             if (attributes.days < 0) {
                 attributes.days = 0;
             }
+            attributes.image_url = googleStreetsViewImage(
+                attributes.latitude, 
+                attributes.longitude,
+                config.GOOGLE_APIKEY
+            );
             return attributes;
         }
     });
@@ -148,8 +162,11 @@ define(function(require) {
     var PermitCollection = Backbone.Collection.extend({
         url: endpoint("permit"),
         model: Permit,
-        parse: function(data) {
-            var results = _.map(data, function(entry) {
+        parse: function(response) {
+            this.metadata = _.omit(response, "objects");
+            var objects = response.objects;
+            return _.map(objects, function(entry) {
+                // Map decisions to human readable
                 if (entry.case_decision === "Approved") {
                     entry.case_decision = "success";
                 } else if (entry.case_decision === "Withdrawn" ||
@@ -161,17 +178,39 @@ define(function(require) {
                 } else if (entry.case_decision === "CEQA") {
                     entry.case_decision = "info";
                 }
+
+                // for templates
+                entry[entry.final_status] = true;
                 return entry;
             });
-            return results;
-        },
-        getNearby: function(addr) {
-            return this.chain().sortBy(distanceMetric(addr));
         }
     });
 
+    var NearestPermitCollection = PermitCollection.extend({
+        initialize: function() {
+            this.metric = "distance"
+        },
+        setMetric: function(m) {
+            if (m == "distance" || m == "units" || m == "risk") {
+                this.metric = m;
+            } else {
+                throw "Metric must be distance|units|risk"
+            }
+        },
+        url: function() {
+            return "/nearest/" + this.metric;
+        }
+    })
+
     var LogCollection = Backbone.Collection.extend({
-        url: endpoint("permit_update_log")
+        url: endpoint("permit_update_log"),
+        parse: function(response) {
+            _.each(response.objects, function(obj) {
+                obj.timestamp_dp = formatDatetime(obj);
+                obj[obj.type] = true;
+            });
+            return response.objects;
+        }
     });
 
     // singleton
@@ -220,6 +259,8 @@ define(function(require) {
         Permit: Permit,
         // Collections,
         PermitCollection: PermitCollection,
+        LogCollection: LogCollection,
+        NearestPermitCollection: NearestPermitCollection,
         // Singletons
         CurrentAddress: CurrentAddressSingleton
     }

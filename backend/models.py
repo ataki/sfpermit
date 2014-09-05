@@ -148,30 +148,37 @@ class Permit(db.Model):
     address = db.Column(db.String(256))
     prediction = db.Column(db.Float)
 
+    # Single table inheritance
+    # See: docs.sqlalchemy.org/en/latest/orm/inheritance.html\
+    # #single-table-inheritance
+    type = db.Column(db.String(20))
+
+    __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': 'permit'
+    }
+
     def __repr__(self):
         return "<Permit at %s>" % self.project_name
 
 
-class StagedPermit(Permit):
-    """Copy of Permit model. Batches updates to the model. Periodic migration
-    from this table into the original table."""
-
-    __tablename__ = 'sfp_staged_permit'
-
-    def __repr__(self):
-        return "<StagedPermit at %s>" % self.project_name
+def StagedPermit(Permit):
+    __mapper_args__ = {
+        'polymorphic_identity': 'staged_permit'
+    }
 
 
 # ------------ Update Logs -------------------------
 
 class PermitUpdateLog(db.Model):
-
     __tablename__ = "sfp_permit_update_log"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    permit_id = db.Column(db.Integer, db.ForeignKey('permit.id'))
+    permit_id = db.Column(db.Integer, db.ForeignKey('sfp_permit.id'))
     text = db.Column(db.String(256))
     timestamp = db.Column(db.DateTime)
+    type = db.Column(db.Enum(*["edit", "note", "closed",
+                               "opened", "created"]))
 
     def __repr__(self):
         return "<Log for permit %d>: %s" % (self.permit_id, self.text)

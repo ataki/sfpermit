@@ -90,41 +90,25 @@ define(function(require) {
             'click .target-about': 'showAbout'
         },
         initialize: function() {
-            _.bindAll(this, "showSearch");
             this.searchview = new Search();
         },
         render: function() {
             var _ref = this;
-            Templates.get("header.view").done(function(template) {
-                _ref.afterTemplateFetch(template);
-            });
             CurrentAddress.on("change", function() {
                 var lat = CurrentAddress.get("latitude")
                     , lng = CurrentAddress.get("longitude");
                 _ref.updateCurrentAddress(lat, lng);
             });
+            if (CurrentAddress.validate()) {
+                this.updateCurrentAddress(
+                    CurrentAddress.get("latitude"),
+                    CurrentAddress.get("longitude")
+                );
+            }
             return this;
         },
-        afterTemplateFetch: function(template) {
-            var html = Mustache.render(template, {});
-            this.$el.html(html);
-            // in case the get happens before the event has
-            // had time to bind
-            var lat = CurrentAddress.get("latitude")
-            , lng = CurrentAddress.get("longitude");
-            this.updateCurrentAddress(lat, lng);
-        },
-        showSearch: function(e) {
-            Backbone.trigger("show.search");
-        },
-        showPermits: function(e) {
-            Backbone.trigger("show.list", Store.get("permits"));
-        },
-        showAbout: function(e) {
-            Backbone.trigger("show.about");
-        },
         updateCurrentAddress: function(lat, lng) {
-            $(".latitude").text(lat.toFixed(2))
+            $(".latitude").text("@" + lat.toFixed(2) + " , ")
             $(".longitude").text(lng.toFixed(2));
         }
     });

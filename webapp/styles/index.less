@@ -91,6 +91,10 @@ hr {
 	margin-top: 0;
 }
 
+a {
+    text-decoration: none !important;
+}
+
 button {
   display: inline-block;
   // margin-bottom: 0; // For input.btn
@@ -136,12 +140,19 @@ input, textarea {
 
 // span augmentation classes
 .s {
-    &-h3 { font-size: 16px; }
+    &-h3 { margin-top: 10px; }
 }
 
 .text-gray {
     color: @gray;
 }
+
+.model-list { 
+    padding: 15px 0;
+    overflow: scroll; 
+}
+.model-row { padding: 15px 0px; }
+
 
 // ------------------------
 // Include modules after utils have been defined
