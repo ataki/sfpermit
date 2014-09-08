@@ -204,8 +204,8 @@ app.config['API_MODELS'] = {
     'permit': {
         'model_class': Permit,
         'methods': ['GET', 'POST', 'PUT'],
-        'results_per_page': 200,
-        'max_results_per_page': 300
+        'results_per_page': -1,
+        'max_results_per_page': -1
     },
     'permit_update_log': {
         'model_class': PermitUpdateLog,

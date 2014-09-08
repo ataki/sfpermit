@@ -9,6 +9,8 @@ define(function(require) {
     var AboutView = require("views/about-view");
     var HelpView = require("views/help-view");
 
+    var permits = Store.DB.permits;
+
     var Router = Backbone.Router.extend({
         routes: {
             "about": "about",
@@ -18,6 +20,7 @@ define(function(require) {
         },
 
         initialize: function() {
+            this.views = {};
             var header = new HeaderView({
                 el: "#header"
             });
@@ -40,33 +43,44 @@ define(function(require) {
                 page = 1;
             }
 
-            var view = new PermitListView({
-                page: page,
-                el: "#side .child.list"
-            });
-            view.render();
+            if (!this.views.permitList) {
+                this.views.permitList = new PermitListView({
+                    page: page,
+                    collection: permits,
+                    el: "#side .child.list"
+                });
+                this.views.permitList.render();
+            } else {
+                // Controller logic, ugh
+                this.views.permitList.setPage(page);
+            }
         },
 
         permitPage: function(_id) {
             var id = parseInt(_id);
-            var permit = Store.PermitCollection.get(id);
+            var permit = permits.get(id);
 
             var promise;
             if (permit) {
-                promise = $.Deferred();
-                promise.resolve(permit);
+                handler(permit);
             } else {
-                promise = Store.Permit.fetch({id: id});
+                permit = new Permit({id: id});
+                permit.on("sync", renderHandler);
+                permit.fetch();
             }
 
-
-            promise.then(function(model) {
-                var view = new PermitView({
-                    model: model,
-                    el: $("#side .detail")
-                });
-                view.render().show();
-            });
+            var _ref = this;
+            function renderHandler(model) {
+                if (_ref.views.permitPage) {
+                    _ref.views.permitPage.model = model;
+                } else {
+                    _ref.views.permitPage = new PermitView({
+                        model: model,
+                        el: $("#side .detail")
+                    });
+                }
+                _ref.views.permitPage.render().show();
+            }
         },
     });
 

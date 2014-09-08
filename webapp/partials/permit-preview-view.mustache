@@ -1,0 +1,24 @@
+<div class="col-sm-5 col-md-3 col-sm-offset-1 col-md-offset-1">
+    <img src="{{image_url}}" class="permit-preview-image" />
+</div>
+<div class="col-sm-5 col-md-8">
+    <h5 class="titular">{{project_name}}</h5>
+    {{#Open}}
+    <div class="row">
+        <div class="col-sm-6 col-md-6">
+            <h2>{{prediction}}</h2>
+            <h6 class="text-aside">chance of approval</h6>
+        </div>
+        <div class="col-ms-6 col-md-6">
+            {{#case_decision_date}}
+            This case's decision date is {{case_decision_date}}
+            {{/case_decision_date}}
+        </div>
+    </div>
+    {{/Open}}
+    {{^Open}}
+    <div>
+    This property is currently <b>{{final_status}}</b>
+    </div>
+    {{/Open}}
+</div>

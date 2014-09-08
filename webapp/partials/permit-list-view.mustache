@@ -1,36 +1,92 @@
-<div class="head">
-  <span class="btn-group s-h3">Sort by&nbsp;&nbsp;</span>
-  <div class="btn-group">
-    <button type="button" class="btn btn-default sort-by proximity">Proximity</button>
-    <button type="button" class="btn btn-default sort-by risk">Risk</button>
-    <button type="button" class="btn btn-default sort-by units">Net Units</button>
-  </div>
-  <a class="close">&times;</a> 
+<a class="close">&times;</a> 
+<h4><strong>Permit List</strong></h4>
+<div class="filter-section">
+    <div class="row">
+        <div class="col-sm-12 col-md-12">
+            <form class="form-horizontal" role="form">
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">Sort by </label>
+                    <div class="col-sm-10">
+                        <div class="btn-group unshift-btn-group">
+                            <button type="button" class="btn btn-default sort-by proximity">Proximity</button>
+                            <button type="button" class="btn btn-default sort-by risk">Risk</button>
+                            <button type="button" class="btn btn-default sort-by units">Net Units</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">Net Units</label>
+                    <div class="col-sm-4">
+                        <input type="password" class="form-control" id="net-units-min" placeholder="min">
+                    </div>
+                    <div class="col-sm-4">
+                        <input type="password" class="form-control" id="net-units-max" placeholder="max">
+                    </div>
+                </div>
+                <hr/>
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">Status</label>
+                    <div class="col-sm-4">
+                        <select class="form-control">
+                            <option value="*">All</option>
+                            <option value="Open">Open</option>
+                            <option value="Cancelled">Cancelled</option>
+                            <option value="Approved">Approved</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="" class="col-sm-2 control-label">Project Size</label>
+                    <div class="col-sm-4">
+                        <select class="form-control">
+                            <option value="*">All</option>
+                            <option value="Small">Small</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Large">Large</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12 col-md-12">
+            
+        </div>
+    </div>
 </div>
+<hr/>
 <ul class="model-list">
     {{#collection}}
     <li class="model-row" data-id="{{id}}">
-        <a href="#">
-            {{#Approved}}
-            <span class="label label-success">A</span>
-            {{/Approved}}
-            {{#Cancelled}}
-            <span class="label label-default">C</span>
-            {{/Cancelled}}
-            {{#Open}}
-            <span class="label label-primary">O</span>
-            {{/Open}}
-            &nbsp;&nbsp;
-            <strong>{{project_name}}</strong>
-            &nbsp;&nbsp;
-            <span>{{days}} days old</span>, 
-            <span>{{net_units}} units</span>
-            {{#prediction}}
-            ,<br/>
-            <span><b>{{prediction}}</b> chance of success</span>
-            {{/prediction}}
-        </a>
-        <br/>
+        <div class="row">
+            <div class="col-sm-1 col-md-1 half-col">
+                <i class="fa fa-chevron-down text-aside"></i>
+            </div>
+            <div class="col-sm-11 col-md-11">
+                <a href="#">
+                    {{#Approved}}
+                    <span class="label label-success">A</span>
+                    {{/Approved}}
+                    {{#Cancelled}}
+                    <span class="label label-default">C</span>
+                    {{/Cancelled}}
+                    {{#Open}}
+                    <span class="label label-primary">O</span>
+                    {{/Open}}
+                    &nbsp;&nbsp;
+                    <strong>{{project_name}}</strong>
+                    &nbsp;&nbsp;
+                    <span>{{days}} days old</span>, 
+                    <span>{{net_units}} units</span>
+                    {{#prediction}},&nbsp;
+                    <span><b>{{prediction}}</b> chance of success</span>
+                    {{/prediction}}
+                </a>
+            </div>
+        </div>
+        <div class="row model-preview-row hidden">
+        </div>
     </li>
     {{/collection}}
 </ul>

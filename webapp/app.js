@@ -46,9 +46,30 @@ require([
     // map.js and then master-control.js
 
     var currentAddress = Store.CurrentAddress;
-    var NearestPermitCollection = Store.NearestPermitCollection;
+    var permits = Store.DB.permits;
 
-    var nearestPermits = new NearestPermitCollection();
+    function initializeAppAndMap() {
+        console.log("Fetched nearest permits");
+        permits.off("sync");
+
+        var permit = permits.first();
+        var initialView = [
+            permit.get("latitude"), 
+            permit.get("longitude")
+        ];
+
+        Map.setup({
+            'key': config.APIKEY, 
+            'mapId': config.MAPBOX_MAP_ID,
+            'initialView': initialView,
+            'data': permits.toJSON()
+        });
+
+        var router = new Router(); 
+        window.router = router;
+        Backbone.history.start();
+        router.navigate("permits/p1", {trigger: true});
+    }
 
     function initializeData() {
         console.log("Initializing data");
@@ -59,24 +80,13 @@ require([
                 lng: currentAddress.get("longitude")
             }
         };
-        nearestPermits.fetch(options).done(function(response) {
-            console.log("fetched nearest permits");
-            var permits = response.results;
-            Store.persist('permits', permits);
-            var initialView = [permits[4].latitude, permits[4].longitude];
 
-            Map.setup({
-                'key': config.APIKEY, 
-                'mapId': config.MAPBOX_MAP_ID,
-                'initialView': initialView,
-                'data': permits
-            });
-
-            var router = new Router(); 
-            window.router = router;
-            Backbone.history.start();
-            router.navigate("permits/p1", {trigger: true});
-        });
+        if (permits.length == 0) {
+            permits.on("sync", initializeAppAndMap);
+            permits.fetch(options);
+        } else {
+            initializeAppAndMap();
+        }
     }
 
     function launch() {

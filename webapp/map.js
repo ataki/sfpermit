@@ -8,29 +8,53 @@ define(function(require) {
 
     var $ = require("jquery");
     var _ = require("underscore");
-    var L = require("leaflet");
+    var L = require("leaflet"); 
     var Store = require("store");
 
     var GlobalAlert = require("utils/global-alert");
 
-    // leaflet map
-    var Map = L.map('map', {'zoomControl': false});
+    // Load Marker Clusters
+    require("leaflet_markercluster");
 
-    // maps markers to a permit id; useful for reusing
-    // markers later on
-    var Markers = {};
+    // leaflet map
+    var map = L.map('map', {'zoomControl': false});
+    var markerCluster = new L.MarkerClusterGroup();
+    var markerIds = {};
 
     // update current address when necessary
-    var CurrentAddress = Store.CurrentAddress;
+    var currentAddress = Store.CurrentAddress;
 
-    // global alert; convenient to display messages
     var globalEditAlert = new GlobalAlert();
 
-    // map of all leaflet controls
     var ctrls = {};
-
-    // controls that are always active
     var activeControls = [];
+
+    var permits = Store.DB.permits;
+    permits.on("sync", renderAllPoints);
+
+    function renderAllPoints(data) {
+        Templates.get("map-popup").done(function(template) {
+            markerCluster.clearLayers();
+            _.each(permits.toJSON(), function(d) {
+                var permit = new Store.Permit(d);
+                if (permit.validate()) {
+                    var addr = permit.getAddress();
+                    var json = permit.toJSON();
+                    var html = Mustache.render(template, json);
+                    // var marker = L.Marker(addr, {
+                    //         color: permit.getColor()
+                    //     })
+                    //     .setRadius(permit.getNetUnitRadius())
+                    //     .bindPopup(html);
+                    var marker = L.Marker(addr).bindPopup(html);
+                    markerIds[d.id] = marker;
+                    markerCluster.addLayer(marker);
+                }
+            });
+            // adds MarkerClustering layer to the map
+            map.addLayer(markerCluster);
+        });
+    }
 
     // global controls
     function hidePanelCtrls() {
@@ -44,22 +68,22 @@ define(function(require) {
 
     // enables all listeners on leaflet map
     function enableMapInteractions() {
-        Map.dragging.enable();
-        Map.touchZoom.enable();
-        Map.doubleClickZoom.enable();
-        // Map.scrollWheelZoom.enable();
-        Map.boxZoom.enable();
-        Map.keyboard.enable();
+        map.dragging.enable();
+        map.touchZoom.enable();
+        map.doubleClickZoom.enable();
+        // map.scrollWheelZoom.enable();
+        map.boxZoom.enable();
+        map.keyboard.enable();
         globalEditAlert.off();
     }
 
     // disable all listeners on leaflet map
     function disableMapInteractions() {
-        Map.dragging.disable();
-        Map.touchZoom.disable();
-        Map.doubleClickZoom.disable();
-        Map.boxZoom.disable();
-        Map.keyboard.disable();
+        map.dragging.disable();
+        map.touchZoom.disable();
+        map.doubleClickZoom.disable();
+        map.boxZoom.disable();
+        map.keyboard.disable();
 
         globalEditAlert.showPersistent();
     }
@@ -67,6 +91,32 @@ define(function(require) {
     function generateSDKUrl(key, mapId) {
         return 'http://{s}.tiles.mapbox.com/v3/' + mapId + '/{z}/{x}/{y}.png';
     }
+
+    // global broadcast actions
+    Backbone.on('map.interaction.disable', function() {
+        disableMapInteractions();
+    });
+
+    Backbone.on('map.interaction.enable', function() {
+        enableMapInteractions();
+    });
+
+    Backbone.on("map.setView", function(address, d) {
+        var addr = address.toMapView();
+        map.panTo(addr);
+        map.setZoom(address.get("zoom") || config.DEFAULT_MAP_ZOOM);
+        currentAddress.set({
+            latitude: address.get("latitude"),
+            longitude: address.get("longitude")
+        });
+
+        if (d) {
+            var marker = markerIds[d.id];
+            if (marker) {
+                marker.openPopup();
+            }
+        }
+    });
     
     // initial setup for controls 
     function setup(options) {
@@ -75,24 +125,24 @@ define(function(require) {
             , mapId = options.mapId
             , data = options.data;
 
-        if (CurrentAddress.get("latitude") != 0 && CurrentAddress.get("longitude") != 0) {
-            var initialView = CurrentAddress.toMapView();
-            Map.setView(initialView, 16);
+        if (currentAddress.get("latitude") != 0 && currentAddress.get("longitude") != 0) {
+            var initialView = currentAddress.toMapView();
+            map.setView(initialView, 11);
         } else {
             // create "global" map
-            CurrentAddress.once("change", function(address) {
-                var initialView = CurrentAddress.toMapView();
-                Map.setView(initialView, 16);
+            currentAddress.once("change", function(address) {
+                var initialView = currentAddress.toMapView();
+                map.setView(initialView, 11);
             });
         }
 
         // Disable scrolling to allow for scrolling on panels
-        Map.scrollWheelZoom.disable();
+        map.scrollWheelZoom.disable();
 
         var tileLayer = L.tileLayer(generateSDKUrl(key, mapId), {
             attribution: 'Map data &copy;',
             maxZoom: 18
-        }).addTo(Map);
+        }).addTo(map);
 
         var firstTime = true;
         tileLayer.on("load", function() {
@@ -102,59 +152,16 @@ define(function(require) {
             }
         });
 
-        Templates.get("map.popup").done(function(template) {
-            _.each(options.data, function(d) {
-                var permit = new Store.Permit(d);
-                if (permit.validate()) {
-                    var addr = permit.getAddress();
-                    var json = permit.toJSON();
-                    var html = Mustache.render(template, json);
-                    var marker = L.circleMarker(addr, {color: permit.getColor()})
-                        .setRadius(permit.getNetUnitRadius())
-                        .addTo(Map)
-                        .bindPopup(html);
-                    Markers[d.id] = marker;
-                }
-            });
-        });
-
         // enable global editing
-        globalEditAlert.setMessage("Map editing disabled");
+        // globalEditAlert.setMessage("Map editing disabled");
 
         // add all map controls to map and hide
         _.each(ctrls, function(ctrl, name) {
-            Map.addControl(ctrl);
+            map.addControl(ctrl);
         })
 
         // need to add zoom manually
-        Map.addControl(L.control.zoom({'position': 'bottomleft'}))
-
-        Backbone.on('map.interaction.disable', function() {
-            disableMapInteractions();
-        });
-
-        Backbone.on('map.interaction.enable', function() {
-            enableMapInteractions();
-        });
-
-        Backbone.on("map.setView", function(address, d) {
-            var addr = address.toMapView();
-            Map.panTo(addr);
-            Map.setZoom(address.get("zoom") || config.DEFAULT_MAP_ZOOM);
-            CurrentAddress.set({
-                latitude: address.get("latitude"),
-                longitude: address.get("longitude")
-            });
-
-            if (d) {
-                var marker = Markers[d.id];
-                if (marker) {
-                    setTimeout(function() {
-                        marker.openPopup();
-                    }, 500);
-                }
-            }
-        });
+        map.addControl(L.control.zoom({'position': 'bottomleft'}))
     };
 
     setTimeout(function() {

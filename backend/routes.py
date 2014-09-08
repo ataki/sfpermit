@@ -142,7 +142,12 @@ def nearest_permits(metric):
     for m in models:
         m.pop("_sa_instance_state")
     # return json.dumps(models, default=default)
-    return jsonify(results=models)
+    return jsonify({
+        "num_results": len(models),
+        "objects": models,
+        "pages": 1,
+        "total_pages": 1
+    })
 
 
 # gets current user data as json

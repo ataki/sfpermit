@@ -190,15 +190,15 @@ define(function(require) {
         initialize: function() {
             this.metric = "distance"
         },
+        url: function() {
+            return "/nearest/" + this.metric;
+        },
         setMetric: function(m) {
             if (m == "distance" || m == "units" || m == "risk") {
                 this.metric = m;
             } else {
                 throw "Metric must be distance|units|risk"
             }
-        },
-        url: function() {
-            return "/nearest/" + this.metric;
         }
     })
 
@@ -244,6 +244,14 @@ define(function(require) {
         );
     }
 
+    // Permit Collection shared by several views
+    var permitCollection = new PermitCollection();
+    permitCollection.fetch();
+
+    var DB = {
+        permits: permitCollection
+    }
+
 
     return {
         setup: setup,
@@ -251,6 +259,7 @@ define(function(require) {
         get: get,
         persist: persist,
         distanceMeasure: externalDistanceMeasure,
+        DB: DB,
         // Models
         Permit: Permit,
         SearchResults: SearchResults,

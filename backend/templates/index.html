@@ -1,13 +1,14 @@
 <html>
   <head>
- 	  <link href='https://fonts.googleapis.com/css?family=Open+Sans:700,400,300' rel='stylesheet' type='text/css'>
     {% if config.DEBUG %}
     <link rel="stylesheet" href="bower_components/leaflet/dist/leaflet.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="index.css" type="text/css" />
+    <link rel="stylesheet" href="bower_components/leaflet.markercluster/dist/MarkerCluster.Default.css" type="text/css" />
     <script data-main="app" src="bower_components/requirejs/require.js"></script>
     {% else %}
     <link rel="stylesheet" href="dist/leaflet.css" type="text/css" />
+    <link rel="stylesheet" href="dist/MarkerCluster.Default.css" type="text/css" />
     <link rel="stylesheet" href="dist/bootstrap.min.css" type="text/css" >
     <link rel="stylesheet" href="dist/index.css" type="text/css" />
     <script src="dist/app.build.js"></script>
