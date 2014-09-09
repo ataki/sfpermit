@@ -32,11 +32,14 @@ define(function(require) {
     var permits = Store.DB.permits;
     permits.on("sync", renderAllPoints);
 
-    function renderAllPoints(data) {
+    if (permits.length != 0) {
+        renderAllPoints();
+    }
+
+    function renderAllPoints() {
         Templates.get("map-popup").done(function(template) {
             markerCluster.clearLayers();
-            _.each(permits.toJSON(), function(d) {
-                var permit = new Store.Permit(d);
+            permits.each(function(permit) {
                 if (permit.validate()) {
                     var addr = permit.getAddress();
                     var json = permit.toJSON();
@@ -46,8 +49,11 @@ define(function(require) {
                     //     })
                     //     .setRadius(permit.getNetUnitRadius())
                     //     .bindPopup(html);
-                    var marker = L.Marker(addr).bindPopup(html);
-                    markerIds[d.id] = marker;
+                    var marker = new L.circleMarker(addr, {
+                        color: permit.getColor()
+                    });
+                    marker.bindPopup(html);
+                    markerIds[permit.id] = marker;
                     markerCluster.addLayer(marker);
                 }
             });

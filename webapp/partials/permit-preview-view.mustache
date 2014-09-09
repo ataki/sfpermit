@@ -1,8 +1,24 @@
 <div class="col-sm-5 col-md-3 col-sm-offset-1 col-md-offset-1">
-    <img src="{{image_url}}" class="permit-preview-image" />
+    <img src="{{image_url}}" class="permit-preview-image" /><br/>
+    <a href="permit/{{id}}" class="btn btn-xs">Visit page</button>
 </div>
 <div class="col-sm-5 col-md-8">
-    <h5 class="titular">{{project_name}}</h5>
+    <h5 class="titular" data-toggle="tooltip" title="Unique Planning ID assigned to each case">
+        Case number <b>{{case_number}}</b>
+    </h5>
+    <h5 class="titular" data-toggle="tooltip" title="The lowest filing date on record for the case">
+        Min Filed <b>{{min_filed}}</b>
+    </h5>
+    <h5 class="titular" data-toggle="tooltip" title="The max action date on record for the case (action dates mean some final action was taken on that case record)">
+        Max Action <b>{{max_action}}</b>
+    </h5>
+    <h5 class="titular">
+        Project Size Class <b>{{project_size_class}}</b>
+    </h5>
+    <h5 class="titular" data-toggle="tooltip" title="Whether or not the case was ultimately approved by planning (this is the key field used to determine a complete case for the past performance analysis)">
+        Planning Approved? <b>{{planning_approved}}</b>
+    </h5>
+    
     {{#Open}}
     <div class="row">
         <div class="col-sm-6 col-md-6">

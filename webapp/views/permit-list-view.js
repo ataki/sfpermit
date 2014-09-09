@@ -34,7 +34,7 @@ define(function(require) {
         className: "paper",
         events: {
             "change form": "syncForm",
-            "click .model-row": "toggleRow"
+            "click .model-row .toggler": "toggleRow"
         },
         curSortBy: "proximity",
         initialize: function(options) {
@@ -52,14 +52,13 @@ define(function(require) {
             this.previews = {};
         },
         toggleRow: function(e) {
-            console.log("toggling row");
-            var id = parseInt($(e.currentTarget).data("id"));
+            var $row = $(e.currentTarget).parent().parent();
+            var id = parseInt($row.data("id"));
             var model = this.collection.get(id);
-            console.log(id);
             if (model) {
                 if (!this.previews[id]) {
                     var view = new PermitPreview({
-                        el: $(e.currentTarget).find(".model-preview-row").get(),
+                        el: $row.find(".model-preview-row").get(),
                         model: model
                     });
                     view.render();
