@@ -10,14 +10,17 @@ define(function(require) {
     var _ = require("underscore");
     var L = require("leaflet"); 
     var Store = require("store");
+    var Templates = require("templates");
 
     var GlobalAlert = require("utils/global-alert");
+    var CurrentAddress = Store.CurrentAddress;
 
     // Load Marker Clusters
     require("leaflet_markercluster");
 
     // leaflet map
     var map = L.map('map', {'zoomControl': false});
+    window._map_ = map;
     var markerCluster = new L.MarkerClusterGroup();
     var markerIds = {};
 
@@ -30,7 +33,7 @@ define(function(require) {
     var activeControls = [];
 
     var permits = Store.DB.permits;
-    permits.on("sync", renderAllPoints);
+    permits.on("reset", renderAllPoints);
 
     if (permits.length != 0) {
         renderAllPoints();
@@ -98,6 +101,16 @@ define(function(require) {
         return 'http://{s}.tiles.mapbox.com/v3/' + mapId + '/{z}/{x}/{y}.png';
     }
 
+    map.on("drag", function() {
+        var center = map.getCenter()
+            , lat = center.lat
+            , lng = center.lng;
+        CurrentAddress.set({
+            "latitude": lat,
+            "longitude": lng
+        })
+    });
+
     // global broadcast actions
     Backbone.on('map.interaction.disable', function() {
         disableMapInteractions();
@@ -117,9 +130,13 @@ define(function(require) {
         });
 
         if (d) {
-            var marker = markerIds[d.id];
-            if (marker) {
-                marker.openPopup();
+            var maybeMarker = markerIds[d.id];
+            try {
+                if (typeof maybeMarker.openPopup === "function") {
+                    maybeMarker.openPopup();
+                }
+            } catch (err) {
+                markerCluster.zoomToShowLayer(maybeMarker);
             }
         }
     });
@@ -179,6 +196,7 @@ define(function(require) {
 
     // Exports
     return {
-        'setup': setup
+        'setup': setup,
+        'map': map
     };
 })

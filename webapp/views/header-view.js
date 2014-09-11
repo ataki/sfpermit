@@ -7,6 +7,8 @@ define(function(require) {
     var Store = require("store");
     var Forms = require("utils/forms");
 
+    require("typeahead");
+
     /**
     * Top Header Component
     */
@@ -15,72 +17,7 @@ define(function(require) {
     var PermitCollection = Store.PermitCollection;
     var Address = Store.Address;
 
-    var Search = Backbone.View.extend({
-        tagName: "div",
-        id: "search-control-view",
-        events: {
-            //"keyup input": "debouncedSearch",
-            "submit form": "zoomToLocation"
-        },
-        initialize: function() {
-            _.bindAll(this, "addFocus", "removeFocus", "showResults", "zoomToLocation");
-            this.collection = new PermitCollection();
-            this.collection.on("reset", this.showResults);
-        },
-        zoomToLocation: function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            var formData = Forms.serializeForm(this.$("form"));
-            var query = $.trim(formData.query) + " San Francisco";
-
-            $.getJSON("/geocode", {query: query}, function(response) {
-                if (response) {
-                    console.log("going to address " + response.address);
-                    var addr = new Address(response);
-                    addr.set("zoom", 15);
-                    Backbone.trigger("map.setView", addr);
-                    Backbone.trigger("hide.search");
-                }
-            });
-        },
-        render: function() {
-            var _ref = this, resultsView = this._resultsView;
-            Templates.get("search.control").done(function(template) {
-                var html = Mustache.render(template, _ref.collection.toJSON());
-                _ref.$el.html(html);
-                _ref.$el.append(resultsView.render().el);
-            });
-            return this;
-        },
-        destroy: function() {
-            // destroy nested child views before 
-            // parent
-            if (this._resultsView != null) {
-                this._resultsView.destroy();
-            }
-            this.remove();
-        },
-        addFocus: function() {
-            this.$el.addClass("infocus");
-        },
-        removeFocus: function() {
-            this.$el.removeClass("infocus");
-            if (this._resultsView) {
-                this._resultsView.hide();
-            }
-        },
-        debouncedSearch: _.debounce(function(e) {
-            var query = $.trim($(e.currentTarget).val());
-            this.collection.fetch({
-                type: 'GET',
-                data: {'query': query},
-                reset: true
-            });
-        }, 500),
-        showResults: function() {
-            this._resultsView.show();
-        }
-    });
+    var endpoint = Store.endpoint;
 
     var Header = Backbone.View.extend({
         id: 'menu-control',
@@ -88,9 +25,6 @@ define(function(require) {
             'click .target-search': 'showSearch',
             'click .target-permits': 'showPermits',
             'click .target-about': 'showAbout'
-        },
-        initialize: function() {
-            this.searchview = new Search();
         },
         render: function() {
             var _ref = this;
@@ -105,7 +39,56 @@ define(function(require) {
                     CurrentAddress.get("longitude")
                 );
             }
+            this.setupSearch();
             return this;
+        },
+        setupSearch: function(source) {
+            this.engine = new Bloodhound({
+                prefetch: {
+                    url: endpoint("permit"),
+                    ajax: {
+                        data: {
+                            results_per_page: 10000
+                        }
+                    },
+                    filter: function(response) {
+                        var objects = response.objects;
+                        return _.map(objects, function(d) {
+                            return {
+                                'value': d.project_name,
+                                'id': d.id,
+                                'latitude': d.latitude,
+                                'longitude': d.longitude
+                            };
+                        });
+                    },
+                    ttl: -1
+                },
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                datumTokenizer: function(d) {
+                    var term = d.value.replace(",", "");
+                    return Bloodhound.tokenizers.whitespace(term);
+                }
+            });
+
+            this.engine.initialize();
+
+            $("#permit-search").typeahead({
+                minLength: 3,
+                highlight: true
+            }, {
+                name: 'permits',
+                source: this.engine.ttAdapter()
+            });
+
+            // typeahead interaction
+            $("#permit-search").on("typeahead:selected", function(evt, d) {
+                var addr = new Address({
+                    latitude: d.latitude,
+                    longitude: d.longitude
+                })
+                Backbone.trigger("map.setView", addr, d); 
+            });
         },
         updateCurrentAddress: function(lat, lng) {
             $(".latitude").text("@" + lat.toFixed(2) + " , ")

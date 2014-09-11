@@ -1,11 +1,9 @@
-<a class="close">&times;</a> 
-<h4><strong>Permit List</strong></h4>
 <div class="filter-section">
     <div class="row">
         <div class="col-sm-12 col-md-12">
             <form class="form-horizontal" role="form">
                 <div class="form-group">
-                    <label for="" class="col-sm-2 control-label">Sort by </label>
+                    <label class="col-sm-2 control-label">Sort by </label>
                     <div class="col-sm-10">
                         <div class="btn-group unshift-btn-group">
                             <button type="button" class="btn btn-default sort-by proximity">Proximity</button>
@@ -17,17 +15,17 @@
                 <div class="form-group">
                     <label for="" class="col-sm-2 control-label">Net Units</label>
                     <div class="col-sm-4">
-                        <input type="password" class="form-control" id="net-units-min" placeholder="min">
+                        <input type="text" name="net_units:min" value="0" class="form-control" id="net-units-min" placeholder="min">
                     </div>
                     <div class="col-sm-4">
-                        <input type="password" class="form-control" id="net-units-max" placeholder="max">
+                        <input type="text" name="net_units:max" value="11000" class="form-control" id="net-units-max" placeholder="max">
                     </div>
                 </div>
                 <hr/>
                 <div class="form-group">
                     <label for="" class="col-sm-2 control-label">Status</label>
                     <div class="col-sm-4">
-                        <select class="form-control">
+                        <select name="final_status" class="form-control">
                             <option value="*">All</option>
                             <option value="Open">Open</option>
                             <option value="Cancelled">Cancelled</option>
@@ -38,12 +36,20 @@
                 <div class="form-group">
                     <label for="" class="col-sm-2 control-label">Project Size</label>
                     <div class="col-sm-4">
-                        <select class="form-control">
+                        <select name="project_size_class" class="form-control">
                             <option value="*">All</option>
                             <option value="Small">Small</option>
                             <option value="Medium">Medium</option>
                             <option value="Large">Large</option>
                         </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-md-offset-2 col-sm-2 col-md-2">
+                        <a href="#" class="sync btn btn-danger">Search</a>
+                    </div>
+                    <div class="col-sm-2 col-md-2">
+                        <a href="#" class="clear btn btn-default">Clear filters</a>
                     </div>
                 </div>
             </form>
@@ -56,37 +62,6 @@
     </div>
 </div>
 <hr/>
+<h4><strong>Permit List</strong></h4>
 <ul class="model-list">
-    {{#collection}}
-    <li class="model-row" data-id="{{id}}">
-        <div class="row">
-            <div class="col-sm-1 col-md-1 half-col toggler">
-                <i class="fa fa-chevron-down text-aside"></i>
-            </div>
-            <div class="col-sm-11 col-md-11">
-                <a href="#">
-                    {{#Approved}}
-                    <span class="label label-success">A</span>
-                    {{/Approved}}
-                    {{#Cancelled}}
-                    <span class="label label-default">C</span>
-                    {{/Cancelled}}
-                    {{#Open}}
-                    <span class="label label-primary">O</span>
-                    {{/Open}}
-                    &nbsp;&nbsp;
-                    <strong>{{project_name}}</strong>
-                    &nbsp;&nbsp;
-                    <span>{{days}} days old</span>, 
-                    <span>{{net_units}} units</span>
-                    {{#prediction}},&nbsp;
-                    <span><b>{{prediction}}</b> chance of success</span>
-                    {{/prediction}}
-                </a>
-            </div>
-        </div>
-        <div class="row model-preview-row hidden">
-        </div>
-    </li>
-    {{/collection}}
 </ul>

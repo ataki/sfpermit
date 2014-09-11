@@ -168,7 +168,7 @@ def StagedPermit(Permit):
     }
 
 
-# ------------ Update Logs -------------------------
+# ------------ Update Logs / Comments ------------------
 
 class PermitUpdateLog(db.Model):
     __tablename__ = "sfp_permit_update_log"
@@ -177,11 +177,26 @@ class PermitUpdateLog(db.Model):
     permit_id = db.Column(db.Integer, db.ForeignKey('sfp_permit.id'))
     text = db.Column(db.String(256))
     timestamp = db.Column(db.DateTime)
-    type = db.Column(db.Enum(*["edit", "note", "closed",
-                               "opened", "created"]))
+    type = db.Column(db.Enum(*["edit",      # user edit
+                               "note",      # online comment
+                               "decision",  # court decision
+                               "action",    # court action
+                               "created"]))
 
     def __repr__(self):
         return "<Log for permit %d>: %s" % (self.permit_id, self.text)
+
+
+class PermitComment(db.Model):
+    __tablename__ = "sfp_permit_comment"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    permit_id = db.Column(db.Integer, db.ForeignKey('sfp_permit.id'))
+    text = db.Column(db.String(256))
+    timestamp = db.Column(db.DateTime)
+
+    def __repr__(self):
+        return "<Comment for permit %d>: %s" % (self.permit_id, self.text)
 
 
 # ------------ API Declaration ---------------------
@@ -204,13 +219,19 @@ app.config['API_MODELS'] = {
     'permit': {
         'model_class': Permit,
         'methods': ['GET', 'POST', 'PUT'],
-        'results_per_page': -1,
+        'results_per_page': 200,
         'max_results_per_page': -1
     },
     'permit_update_log': {
         'model_class': PermitUpdateLog,
-        'methods': ['GET'],
-        'results_per_page': 200,
-        'max_results_per_page': 300
+        'methods': ['GET', 'POST'],
+        'results_per_page': 15,
+        'max_results_per_page': 30
+    },
+    'comment': {
+        'model_class': PermitComment,
+        'methods': ['GET', 'POST'],
+        'results_per_page': 10,
+        'max_results_per_page': 30
     }
 }

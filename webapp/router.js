@@ -13,6 +13,7 @@ define(function(require) {
 
     var Router = Backbone.Router.extend({
         routes: {
+            "": "reroute",
             "about": "about",
             "help": "help",
             "permits/p:page": "permitList",
@@ -25,6 +26,23 @@ define(function(require) {
                 el: "#header"
             });
             header.render();
+
+            var _ref = this;
+            // allow components to navigate by pub-sub
+            Backbone.on("navigate:permit", function(id) {
+                _ref.navigate("permit/" + id);
+            });
+        },
+
+        reroute: function() {
+            var page = 1;
+            if (this.views.permitList) {
+                page = this.views.permitList.query.data.page;
+            }
+            this.navigate("permits/p" + page, {
+                trigger: true, 
+                replace: true
+            });
         },
 
         about: function() {
@@ -39,8 +57,12 @@ define(function(require) {
 
         permitList: function(page) {
             console.log("navigating to permitList");
+            
+            if (this.views.permitPage) {
+                this.views.permitPage.hide();
+            }
             if (!page) {
-                page = 1;
+                throw new Error("Must have a page");
             }
 
             if (!this.views.permitList) {
@@ -60,26 +82,26 @@ define(function(require) {
             var id = parseInt(_id);
             var permit = permits.get(id);
 
-            var promise;
-            if (permit) {
-                handler(permit);
-            } else {
-                permit = new Permit({id: id});
-                permit.on("sync", renderHandler);
-                permit.fetch();
-            }
-
             var _ref = this;
-            function renderHandler(model) {
+            function handler(model) {
                 if (_ref.views.permitPage) {
                     _ref.views.permitPage.model = model;
                 } else {
                     _ref.views.permitPage = new PermitView({
                         model: model,
-                        el: $("#side .detail")
+                        el: $("#detail")
                     });
                 }
                 _ref.views.permitPage.render().show();
+            }
+
+            var promise;
+            if (permit) {
+                handler(permit);
+            } else {
+                permit = new Permit({id: id});
+                permit.on("sync", handler);
+                permit.fetch();
             }
         },
     });

@@ -11,7 +11,8 @@ requirejs.config({
         moment: 'bower_components/moment/min/moment.min',
         bootstrap: 'bower_components/bootstrap/dist/js/bootstrap.min',
 		leaflet: 'bower_components/leaflet/dist/leaflet',
-        leaflet_markercluster: 'bower_components/leaflet.markercluster/dist/leaflet.markercluster'
+        leaflet_markercluster: 'bower_components/leaflet.markercluster/dist/leaflet.markercluster',
+        typeahead: 'bower_components/typeahead.js/dist/typeahead.bundle.min' 
 	},
 
 	shim: {
@@ -31,6 +32,10 @@ requirejs.config({
 			deps: ['jquery', 'underscore'],
 			exports: 'Backbone'
 		},
+
+        typeahead: {
+            deps: ['jquery']
+        }
 	}
 })
 
