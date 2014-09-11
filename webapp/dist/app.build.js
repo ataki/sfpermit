@@ -4,7 +4,7 @@
  * see: http://github.com/jrburke/almond for details
  */
 
-/*! jQuery v2.1.0 | (c) 2005, 2014 jQuery Foundation, Inc. | jquery.org/license */
+/*! jQuery v2.1.1 | (c) 2005, 2014 jQuery Foundation, Inc. | jquery.org/license */
 
 //# sourceMappingURL=jquery.min.map;
 //     Underscore.js 1.6.0
