@@ -93,7 +93,13 @@ class Permit(db.Model):
     allowed_height = db.Column(db.Float)
     plan_area = db.Column(db.Integer)
     case_decision_date = db.Column(db.DateTime)
-    case_decision = db.Column(db.Enum(*['Cancelled', 'Approved', 'CEQA', 'Withdrawn', 'Disapproved', ''], name="case_decision"))
+    case_decision = db.Column(db.Enum(*[
+                              'Cancelled',
+                              'Approved',
+                              'CEQA',
+                              'Withdrawn',
+                              'Disapproved',
+                              ''], name="case_decision"))
     q4_report_status = db.Column(db.String(64))
     last_planning_suffix = db.Column(db.String(16))
     last_planning_action = db.Column(db.String(64))
@@ -126,13 +132,15 @@ class Permit(db.Model):
     blocklot_in_q4_report = db.Column(db.Integer)
     in_q4_report = db.Column(db.Integer)
     missing_data = db.Column(db.Integer)
-    final_status = db.Column(db.Enum(*['Cancelled', 'Open', 'Approved'], name="final_status"))
+    final_status = db.Column(db.Enum(*['Cancelled', 'Open', 'Approved'],
+                             name="final_status"))
     case_year = db.Column(db.Integer)
     filing_year = db.Column(db.Integer)
     action_year = db.Column(db.Integer)
     should_be = db.Column(db.String(64))
     reason = db.Column(db.String(256))
-    project_size_class = db.Column(db.Enum(*['Small', 'Medium', 'Large'], name="project_class_size"))
+    project_size_class = db.Column(db.Enum(*['Small', 'Medium', 'Large'],
+                                   name="project_class_size"))
 
     # Own, augmented fields
     latitude = db.Column(db.Float)
@@ -140,77 +148,55 @@ class Permit(db.Model):
     address = db.Column(db.String(256))
     prediction = db.Column(db.Float)
 
+    # Single table inheritance
+    # See: docs.sqlalchemy.org/en/latest/orm/inheritance.html\
+    # #single-table-inheritance
+    type = db.Column(db.String(20))
+
+    __mapper_args__ = {
+        'polymorphic_on': type,
+        'polymorphic_identity': 'permit'
+    }
+
     def __repr__(self):
         return "<Permit at %s>" % self.project_name
 
 
-class StagedPermit(db.Model):
-    """Batches updates to the model. Periodic migration
-    from this table into the original table."""
+def StagedPermit(Permit):
+    __mapper_args__ = {
+        'polymorphic_identity': 'staged_permit'
+    }
 
-    __tablename__ = 'sfp_staged_permit'
 
-    # Original fields
+# ------------ Update Logs / Comments ------------------
+
+class PermitUpdateLog(db.Model):
+    __tablename__ = "sfp_permit_update_log"
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    case_number = db.Column(db.String(16))
-    total_records_by_case = db.Column(db.Integer)
-    project_name = db.Column(db.String(256))
-    net_units = db.Column(db.Integer)
-    block_lot = db.Column(db.String(16))
-    min_filed = db.Column(db.DateTime)
-    max_action = db.Column(db.DateTime)
-    allowed_height = db.Column(db.Float)
-    plan_area = db.Column(db.Integer)
-    case_decision_date = db.Column(db.DateTime)
-    case_decision = db.Column(db.Enum(*['Cancelled', 'Approved', 'CEQA', 'Withdrawn', 'Disapproved', ''], name="case_decision"))
-    q4_report_status = db.Column(db.String(64))
-    last_planning_suffix = db.Column(db.String(16))
-    last_planning_action = db.Column(db.String(64))
-    days = db.Column(db.Integer)
-    er_complete = db.Column(db.Integer)
-    er_interim = db.Column(db.Integer)
-    er_open = db.Column(db.Integer)
-    cat_ex_32 = db.Column(db.Integer)
-    cpe = db.Column(db.Integer)
-    neg_dec = db.Column(db.Integer)
-    eir = db.Column(db.Integer)
-    e = db.Column(db.Integer)
-    c = db.Column(db.Integer)
-    v = db.Column(db.Integer)
-    x = db.Column(db.Integer)
-    d = db.Column(db.Integer)
-    a = db.Column(db.Integer)
-    r = db.Column(db.Integer)
-    total = db.Column(db.Integer)
-    diff = db.Column(db.Integer)
-    multiple = db.Column(db.Integer)
-    cancelled_planning = db.Column(db.Integer)
-    cancelled_bp = db.Column(db.Integer)
-    in_current_planning = db.Column(db.Integer)
-    bp_reinstated = db.Column(db.Integer)
-    bp_issued = db.Column(db.Integer)
-    occupancy_permit = db.Column(db.Integer)
-    planning_approved = db.Column(db.Integer)
-    case_in_q4_report = db.Column(db.Integer)
-    blocklot_in_q4_report = db.Column(db.Integer)
-    in_q4_report = db.Column(db.Integer)
-    missing_data = db.Column(db.Integer)
-    final_status = db.Column(db.Enum(*['Cancelled', 'Open', 'Approved'], name="final_status"))
-    case_year = db.Column(db.Integer)
-    filing_year = db.Column(db.Integer)
-    action_year = db.Column(db.Integer)
-    should_be = db.Column(db.String(64))
-    reason = db.Column(db.String(256))
-    project_size_class = db.Column(db.Enum(*['Small', 'Medium', 'Large'], name="project_class_size"))
-
-    # Own, augmented fields
-    latitude = db.Column(db.Float)
-    longitude = db.Column(db.Float)
-    address = db.Column(db.String(256))
-    prediction = db.Column(db.Float)
+    permit_id = db.Column(db.Integer, db.ForeignKey('sfp_permit.id'))
+    text = db.Column(db.String(256))
+    timestamp = db.Column(db.DateTime)
+    type = db.Column(db.Enum(*["edit",      # user edit
+                               "note",      # online comment
+                               "decision",  # court decision
+                               "action",    # court action
+                               "created"]))
 
     def __repr__(self):
-        return "<Permit at %s>" % self.project_name
+        return "<Log for permit %d>: %s" % (self.permit_id, self.text)
+
+
+class PermitComment(db.Model):
+    __tablename__ = "sfp_permit_comment"
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    permit_id = db.Column(db.Integer, db.ForeignKey('sfp_permit.id'))
+    text = db.Column(db.String(256))
+    timestamp = db.Column(db.DateTime)
+
+    def __repr__(self):
+        return "<Comment for permit %d>: %s" % (self.permit_id, self.text)
 
 
 # ------------ API Declaration ---------------------
@@ -234,6 +220,18 @@ app.config['API_MODELS'] = {
         'model_class': Permit,
         'methods': ['GET', 'POST', 'PUT'],
         'results_per_page': 200,
-        'max_results_per_page': 300
+        'max_results_per_page': -1
+    },
+    'permit_update_log': {
+        'model_class': PermitUpdateLog,
+        'methods': ['GET', 'POST'],
+        'results_per_page': 15,
+        'max_results_per_page': 30
+    },
+    'comment': {
+        'model_class': PermitComment,
+        'methods': ['GET', 'POST'],
+        'results_per_page': 10,
+        'max_results_per_page': 30
     }
 }

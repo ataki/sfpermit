@@ -8,39 +8,62 @@ define(function(require) {
 
     var $ = require("jquery");
     var _ = require("underscore");
-    var L = require("leaflet");
+    var L = require("leaflet"); 
     var Store = require("store");
+    var Templates = require("templates");
 
-    var HelpControl = require("controls/help-control");
-    var MenuControl = require("controls/menu-control");
-    var SearchControl = require("controls/search-control");
-    var ListControl = require("controls/list-control");
-    var AboutControl = require("controls/about-control");
     var GlobalAlert = require("utils/global-alert");
-
-    // leaflet map
-    var Map = L.map('map', {'zoomControl': false});
-
-    // maps markers to a permit id; useful for reusing
-    // markers later on
-    var Markers = {};
-
-    // update current address when necessary
     var CurrentAddress = Store.CurrentAddress;
 
-    // global alert; convenient to display messages
+    // Load Marker Clusters
+    require("leaflet_markercluster");
+
+    // leaflet map
+    var map = L.map('map', {'zoomControl': false});
+    window._map_ = map;
+    var markerCluster = new L.MarkerClusterGroup();
+    var markerIds = {};
+
+    // update current address when necessary
+    var currentAddress = Store.CurrentAddress;
+
     var globalEditAlert = new GlobalAlert();
 
-    // map of all leaflet controls
-    var ctrls = {
-      'search': new SearchControl(),
-      'menu': new MenuControl(),
-      'list': new ListControl(),
-      'about': new AboutControl()
-    };
+    var ctrls = {};
+    var activeControls = [];
 
-    // controls that are always active
-    var activeControls = ['menu'];
+    var permits = Store.DB.permits;
+    permits.on("reset", renderAllPoints);
+
+    if (permits.length != 0) {
+        renderAllPoints();
+    }
+
+    function renderAllPoints() {
+        Templates.get("map-popup").done(function(template) {
+            markerCluster.clearLayers();
+            permits.each(function(permit) {
+                if (permit.validate()) {
+                    var addr = permit.getAddress();
+                    var json = permit.toJSON();
+                    var html = Mustache.render(template, json);
+                    // var marker = L.Marker(addr, {
+                    //         color: permit.getColor()
+                    //     })
+                    //     .setRadius(permit.getNetUnitRadius())
+                    //     .bindPopup(html);
+                    var marker = new L.circleMarker(addr, {
+                        color: permit.getColor()
+                    });
+                    marker.bindPopup(html);
+                    markerIds[permit.id] = marker;
+                    markerCluster.addLayer(marker);
+                }
+            });
+            // adds MarkerClustering layer to the map
+            map.addLayer(markerCluster);
+        });
+    }
 
     // global controls
     function hidePanelCtrls() {
@@ -54,22 +77,22 @@ define(function(require) {
 
     // enables all listeners on leaflet map
     function enableMapInteractions() {
-        Map.dragging.enable();
-        Map.touchZoom.enable();
-        Map.doubleClickZoom.enable();
-        // Map.scrollWheelZoom.enable();
-        Map.boxZoom.enable();
-        Map.keyboard.enable();
+        map.dragging.enable();
+        map.touchZoom.enable();
+        map.doubleClickZoom.enable();
+        // map.scrollWheelZoom.enable();
+        map.boxZoom.enable();
+        map.keyboard.enable();
         globalEditAlert.off();
     }
 
     // disable all listeners on leaflet map
     function disableMapInteractions() {
-        Map.dragging.disable();
-        Map.touchZoom.disable();
-        Map.doubleClickZoom.disable();
-        Map.boxZoom.disable();
-        Map.keyboard.disable();
+        map.dragging.disable();
+        map.touchZoom.disable();
+        map.doubleClickZoom.disable();
+        map.boxZoom.disable();
+        map.keyboard.disable();
 
         globalEditAlert.showPersistent();
     }
@@ -77,6 +100,46 @@ define(function(require) {
     function generateSDKUrl(key, mapId) {
         return 'http://{s}.tiles.mapbox.com/v3/' + mapId + '/{z}/{x}/{y}.png';
     }
+
+    map.on("drag", function() {
+        var center = map.getCenter()
+            , lat = center.lat
+            , lng = center.lng;
+        CurrentAddress.set({
+            "latitude": lat,
+            "longitude": lng
+        })
+    });
+
+    // global broadcast actions
+    Backbone.on('map.interaction.disable', function() {
+        disableMapInteractions();
+    });
+
+    Backbone.on('map.interaction.enable', function() {
+        enableMapInteractions();
+    });
+
+    Backbone.on("map.setView", function(address, d) {
+        var addr = address.toMapView();
+        map.panTo(addr);
+        map.setZoom(address.get("zoom") || config.DEFAULT_MAP_ZOOM);
+        currentAddress.set({
+            latitude: address.get("latitude"),
+            longitude: address.get("longitude")
+        });
+
+        if (d) {
+            var maybeMarker = markerIds[d.id];
+            try {
+                if (typeof maybeMarker.openPopup === "function") {
+                    maybeMarker.openPopup();
+                }
+            } catch (err) {
+                markerCluster.zoomToShowLayer(maybeMarker);
+            }
+        }
+    });
     
     // initial setup for controls 
     function setup(options) {
@@ -85,127 +148,44 @@ define(function(require) {
             , mapId = options.mapId
             , data = options.data;
 
-        if (CurrentAddress.get("latitude") != 0 && CurrentAddress.get("longitude") != 0) {
-            var initialView = CurrentAddress.toMapView();
-            Map.setView(initialView, 16);
+        if (currentAddress.get("latitude") != 0 && currentAddress.get("longitude") != 0) {
+            var initialView = currentAddress.toMapView();
+            map.setView(initialView, 11);
         } else {
-            CurrentAddress.once("change", function(address) {
-                // create "global" map
-                var initialView = CurrentAddress.toMapView();
-                Map.setView(initialView, 16);
+            // create "global" map
+            currentAddress.once("change", function(address) {
+                var initialView = currentAddress.toMapView();
+                map.setView(initialView, 11);
             });
         }
 
         // Disable scrolling to allow for scrolling on panels
-        Map.scrollWheelZoom.disable();
+        map.scrollWheelZoom.disable();
 
-        L.tileLayer(generateSDKUrl(key, mapId), {
+        var tileLayer = L.tileLayer(generateSDKUrl(key, mapId), {
             attribution: 'Map data &copy;',
             maxZoom: 18
-        }).addTo(Map);
+        }).addTo(map);
 
-        Templates.get("map.popup").done(function(template) {
-            _.each(options.data, function(d) {
-                var permit = new Store.Permit(d);
-                if (permit.validate()) {
-                    var addr = permit.getAddress();
-                    var json = permit.toJSON();
-                    var html = Mustache.render(template, json);
-                    var marker = L.circleMarker(addr, {color: permit.getColor()})
-                        .setRadius(permit.getNetUnitRadius())
-                        .addTo(Map)
-                        .bindPopup(html);
-                    Markers[d.id] = marker;
-                }
-            });
+        var firstTime = true;
+        tileLayer.on("load", function() {
+            if (firstTime) {
+              Backbone.trigger("show.about");
+              firstTime = false;
+            }
         });
 
         // enable global editing
-        globalEditAlert.setMessage("Map editing disabled");
+        // globalEditAlert.setMessage("Map editing disabled");
 
         // add all map controls to map and hide
         _.each(ctrls, function(ctrl, name) {
-            Map.addControl(ctrl);
+            map.addControl(ctrl);
         })
 
-        // hide panels initially
-        hidePanelCtrls();   
-
-        Map.addControl(L.control.zoom({'position': 'bottomleft'}))
-
-        Backbone.on('show.search', function() {
-            hidePanelCtrls();
-            ctrls.search.showView();
-            disableMapInteractions();
-        });
-
-        Backbone.on('hide.search', function() {
-            ctrls.search.hideView();
-            enableMapInteractions();
-        });
-
-        Backbone.on('show.about', function() {
-            hidePanelCtrls();
-            ctrls.about.showView();
-        });
-
-        Backbone.on('hide.about', function() {
-            ctrls.about.hideView();
-        });
-
-        Backbone.on('show.list', function(data) {
-            if (!data) {
-                throw new Error("list view needs data!");
-            } 
-            ctrls.search.hideView();
-            ctrls.list.updateViewData(data);
-            ctrls.list.showView();
-        });
-
-        Backbone.on('hide.list', function() {
-            enableMapInteractions();
-            ctrls.list.cleanUpView();
-            ctrls.list.hideView();
-        });
-
-        Backbone.on('map.interaction.disable', function() {
-            disableMapInteractions();
-        });
-
-        Backbone.on('map.interaction.enable', function() {
-            enableMapInteractions();
-        });
-
-        Backbone.on("map.setView", function(address, d) {
-            var addr = address.toMapView();
-            Map.panTo(addr);
-            Map.setZoom(address.get("zoom") || config.DEFAULT_MAP_ZOOM);
-            console.log(address.toMapView());
-            CurrentAddress.set({
-                latitude: address.get("latitude"),
-                longitude: address.get("longitude")
-            });
-
-            if (d) {
-                var marker = Markers[d.id];
-                if (marker) {
-                    setTimeout(function() {
-                        marker.openPopup();
-                    }, 500);
-                }
-            }
-        });
+        // need to add zoom manually
+        map.addControl(L.control.zoom({'position': 'bottomleft'}))
     };
-
-    // hide all controls when esc key is pressed
-    $(document).on("keyup", function(e) {
-        if (e.which == 27) {
-            Backbone.trigger("hide.search");
-            Backbone.trigger("list.hide");
-        }
-    });
-
-    Backbone.trigger("show.about");
 
     setTimeout(function() {
         $(".flashes").fadeOut('slow', function() {
@@ -216,6 +196,7 @@ define(function(require) {
 
     // Exports
     return {
-        'setup': setup
+        'setup': setup,
+        'map': map
     };
 })

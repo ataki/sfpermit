@@ -1,0 +1,14 @@
+<div class="timeline-block">
+    <div class="timeline-timestamp">
+        <div class="text-aside timeline-timestamp-date">{{ timestamp_dp }}</div>
+        {{#decision}}
+        <div class="timeline-circle primary"></div>
+        {{/decision}}
+        {{^decision}}
+        <div class="timeline-circle default"></div>
+        {{/decision}}
+    </div>
+    <div class="timeline-content">
+        <p><strong>{{ type }}</strong> {{ text }}</p>
+    </div>
+</div>
