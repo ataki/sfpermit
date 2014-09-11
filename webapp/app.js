@@ -78,6 +78,7 @@ require([
         router.navigate("permits/p1", {trigger: true});
     }
 
+
     function initializeData() {
         console.log("Initializing data");
         var options = {
