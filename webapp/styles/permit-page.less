@@ -1,0 +1,96 @@
+.timeline {
+  position: relative;
+  padding: 2em 0;
+  margin-top: 2em;
+  margin-bottom: 2em;
+  padding-left: 75px;
+  overflow: scroll;
+}
+
+.timeline::before {
+  /* this is the vertical line */
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 150px;
+  height: 100%;
+  width: 4px;
+  background: #d7e4ed;
+}
+
+.timeline-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 24px;
+  margin-left: 65px;
+  z-index: 900;
+  &.default {
+    border: 1px solid #d7e4ed;
+    background-color: #FFFFFF;
+  }
+  &.primary {
+    border: 0;
+    background-color: #d7e4ed;
+  }
+}
+
+.timeline-content {
+  margin-left: 125px;
+  margin-bottom: 30px;
+}
+
+.timeline-timestamp {
+  position: absolute;
+}
+
+.timeline-timestamp-date{
+  position: absolute;
+  margin-left: -125px;
+}
+
+.cssanimations .timeline-circle.is-hidden {
+  visibility: hidden;
+}
+.cssanimations .timeline-circle.bounce-in {
+  visibility: visible;
+  animation: cd-bounce-1 0.6s;
+}
+ 
+@keyframes cd-bounce-1 {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+ 
+  60% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+ 
+  100% {
+    transform: scale(1);
+  }
+}
+
+// ------ Comments -------
+
+.permit-comments-list-wrapper {
+  border-left: 2px solid #efefef;
+}
+
+.permit-comments-list {
+  height: 75%;
+  max-height: 400px;
+  width: 100%;
+  overflow: scroll;
+}
+
+.permit-comment {
+  border-top: 1px solid #efefef; 
+  padding: 10px 20px;
+}
+
+.permit-form.well {
+  padding-bottom: 5px !important;
+  margin-top: 10px;
+}

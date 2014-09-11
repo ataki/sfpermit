@@ -22,8 +22,16 @@ define(function(require) {
 
     function setup() {}
 
+    function formatDatetimeWSeconds(dt) {
+        var mm = moment(dt);
+        if (mm.isValid()) return mm.format('MMM Do YYYY, HH:mm:ss');
+        else return "Unknown";
+    }
+
     function formatDatetime(dt) {
-        return moment(dt).format('MMMM Do YYYY, h:mm:ss a');
+        var mm = moment(dt);
+        if (mm.isValid()) return mm.format('MMM Do YYYY');
+        else return "Unknown";
     }
 
     // endpoint for API calls
@@ -36,6 +44,22 @@ define(function(require) {
     }
 
     function square(x) { return x * x; }
+
+    function makeEqualsFilter(name, value) {
+        return {"name": name, "op": "==", "val": value};
+    }
+
+    function makeLikeFilter(name, value) {
+       return {"name": name, "op": "like", "val": '%' + value + '%'}; 
+    }
+
+    function makeGTFilter(name, value) {
+       return {"name": name, "op": "gt", "val": value}; 
+    }
+
+    function makeLTFilter(name, value) {
+       return {"name": name, "op": "lt", "val": value}; 
+    }
 
     function distanceMeasure(addr) {
         var lat = addr.get("latitude")
@@ -75,6 +99,55 @@ define(function(require) {
         }
     });
 
+    var Comment = Backbone.Model.extend({
+        url: function() {
+            if (!this.id) return endpoint("comment");
+            else return endpoint("comment/" + this.id);
+        },
+        validate: function() {
+            var attrs = this.attributes;
+            if (!_.has(attrs, "text") || !_.has(attrs, "permit_id")) 
+                return "Not enough fields to comment";
+            if (attrs.text.length == 0) 
+                return "Comments must have non empty field";
+        },
+        toJSON: function() {
+            var attrs = _.clone(this.attributes);
+            attrs.timestamp = formatDatetimeWSeconds(attrs.timestamp);
+            return attrs;
+        }
+    });
+
+    var CommentCollection = Backbone.Collection.extend({
+        url: endpoint("comment"),
+        model: Comment,
+        initialize: function(permit) {
+            this.query = {page: 1};
+        },
+        setPermitId: function(id) {
+            this.query.q = JSON.stringify({
+                filters: [
+                    makeEqualsFilter("permit_id", parseInt(id))
+                ]
+            });
+        },
+        parse: function(response) {
+            this.metadata = _.omit(response, "objects"); 
+            return response.objects;
+        },
+        fetchForModel: function(id) {
+           var filter = makeEqualsFilter("permit_id", id);
+            this.query.q = JSON.stringify({
+                filters: [filter],
+                order_by: [{
+                    "field": "timestamp", 
+                    "direction": "desc"
+                }]
+            });
+            return this.fetch({data: this.query, reset: true}); 
+        }
+    });
+
     var Permit = Backbone.Model.extend({
         validate: function() {
             return !isNaN(this.get("latitude")) && 
@@ -87,12 +160,12 @@ define(function(require) {
             var prediction = this.get("prediction");
             var final_status = this.get("final_status");
             if (final_status != 'Open') {
-                return "gray";
+                return "#555";
             }
             if (0 < prediction && prediction <= 0.3) {
                 return "red";
             } else if (0.3 < prediction && prediction <= 0.7) {
-                return "gray";
+                return "#555";
             } else if (prediction > 0.7) {
                 return "green";
             }
@@ -140,6 +213,11 @@ define(function(require) {
             }
         },
         toJSON: function() { 
+            /**** 
+                TODO Rename this method and replace collection.toJSON calls
+                to collection.map(function(m) { m.toMustacheJSON(); }).
+                This is currently abusing the toJSON() method.
+            */
             var attributes = _.clone(this.attributes);
             attributes.prediction_level = this.getPredictionLevel();
             attributes.days_level = this.getDaysLevel(); 
@@ -155,6 +233,10 @@ define(function(require) {
                 attributes.longitude,
                 config.GOOGLE_APIKEY
             );
+            attributes.min_filed = moment(attributes.min_filed).format("MMMM Do YYYY");
+            attributes.max_action = moment(attributes.max_action).format("MMMM Do YYYY");
+            attributes.planning_approved = attributes.planning_approved ? "False": "True"; 
+            attributes.in_current_planning = attributes.in_current_planning ? "False": "True";
             return attributes;
         }
     });
@@ -202,14 +284,65 @@ define(function(require) {
         }
     })
 
+    var Log = Backbone.Model.extend({
+        url: function() {
+            if (this.id) return endpoint("permit_update_log/" + this.id);
+            else return endpoint("permit_update_log");
+        },
+        validate: function() {
+            var attrs = this.attributes;
+            if (!_.has(attrs, "text") || !_.has(attrs, "permit_id")) return "Not enough attributes";
+            if (attrs.text.length == 0) {
+                return "Log doesn't have a comment";
+            }
+        },
+        toJSON: function() {
+            var attrs = this.attributes;
+            attrs.timestamp = formatDatetimeWSeconds(attrs.timestamp);
+            return attrs;
+        }
+    });
+
     var LogCollection = Backbone.Collection.extend({
         url: endpoint("permit_update_log"),
+        model: Log,
+        initialize: function() {
+            this.query = {page: 1};
+        },
         parse: function(response) {
-            _.each(response.objects, function(obj) {
-                obj.timestamp_dp = formatDatetime(obj);
+            var sorted_response = _.sortBy(response.objects, function(obj) {
+                var mm = moment(obj.timestamp);
+                if (!mm.isValid()) {
+                    if (obj.type == "decision") {
+                        console.log(obj.type);
+                        mm = moment();
+                    } else {
+                        var min_filed = moment(obj.min_filed).toDate();
+                        var ts = min_filed.getTime() + 1000;
+                        mm = moment(ts);
+                    }
+                }
+                return -mm._d.getTime();
+            });
+            _.each(sorted_response, function(obj) {
+                obj.timestamp_dp = formatDatetime(obj.timestamp);
                 obj[obj.type] = true;
             });
-            return response.objects;
+            return sorted_response;
+        },
+        setPage: function(page) {
+            this.query.page = page;
+        },
+        fetchForModel: function(id) {
+            var filter = makeEqualsFilter("permit_id", id);
+            this.query.q = JSON.stringify({
+                filters: [filter],
+                order_by: [{
+                    "field": "timestamp", 
+                    "direction": "desc"
+                }]
+            });
+            return this.fetch({data: this.query, reset: true});
         }
     });
 
@@ -250,15 +383,20 @@ define(function(require) {
 
     var DB = {
         permits: permitCollection
-    }
-
+    };
 
     return {
         setup: setup,
         endpoint: endpoint,
         get: get,
         persist: persist,
-        distanceMeasure: externalDistanceMeasure,
+        makeGTFilter: makeGTFilter,
+        makeLTFilter: makeLTFilter,
+        makeLikeFilter: makeLikeFilter,
+        makeEqualsFilter: makeEqualsFilter,
+        distanceMeasure: distanceMeasure,
+        formatDatetime: formatDatetime,
+        formatDatetimeWSeconds: formatDatetimeWSeconds,
         DB: DB,
         // Models
         Permit: Permit,
@@ -266,11 +404,14 @@ define(function(require) {
         Schema: Schema,
         Address: Address,
         Permit: Permit,
+        Comment: Comment,
+        Log: Log,
         // Collections,
         PermitCollection: PermitCollection,
         LogCollection: LogCollection,
+        CommentCollection: CommentCollection,
         NearestPermitCollection: NearestPermitCollection,
         // Singletons
-        CurrentAddress: CurrentAddressSingleton
+        CurrentAddress: CurrentAddressSingleton, 
     }
 });

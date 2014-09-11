@@ -1,5 +1,46 @@
 <div class="permit-detail-view">
-    <h3>{{name}}</h3>
-    <div class="timeline">
+    <div class="container">
+        <a class="close" href="#">&times;</a>
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+                <h2>{{ project_name }}</h2>
+                <h4 class="text-aside">{{ final_status }}</h4>
+                <p>
+                    <ul class="project-info">
+                        <li><strong>{{prediction}}%</strong> chance of success</li>
+                        <li><strong>Address</strong> {{address}}</li>
+                        <li><strong>Case Number</strong> {{case_number}}</li>
+                        <li><strong>Net Units</strong> {{net_units}}</li>
+                        <li><strong>Number of days active</strong> {{days}}</li>
+                        <li><strong>In current planning?</strong> {{in_current_planning}}</li>
+                    </ul>
+                </p>
+                <a href="/edit/{{id}}" target="_blank">Edit Information</a>
+                <div class="timeline">
+                </div>
+            </div>
+            <div class="hidden-xs col-sm-5 col-md-5 col-lg-5 col-sm-offset-1 col-md-offset-1 col-lg-offset-1 permit-comments-list-wrapper">  
+                <div class="permit-comments">
+                    <h4>Comments</h4>
+                    <div class="permit-comments-list">
+                    </div>
+                    <div class="permit-form well">
+                        <form role="form">
+                            <div class="form-group">
+                                <textarea type="text" name="text" cols="10" rows="4" class="form-control" placeholder="Your text here" />
+                            </div>
+                            <div class="checkbox">
+                                <label>
+                                    <input name="postToTimeline" type="checkbox">Show on timeline
+                                </label>
+                            </div>
+                            <button type="submit" class="btn btn-danger">
+                                Post Comment
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

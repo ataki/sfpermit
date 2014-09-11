@@ -1,0 +1,32 @@
+{{#collection}}
+<li class="model-row" data-id="{{id}}">
+    <div class="row">
+        <div class="col-sm-1 col-md-1 half-col toggler">
+            <i class="fa fa-chevron-down text-aside"></i>
+        </div>
+        <div class="col-sm-11 col-md-11">
+            <a href="#">
+                {{#Approved}}
+                <span class="label label-success">A</span>
+                {{/Approved}}
+                {{#Cancelled}}
+                <span class="label label-default">C</span>
+                {{/Cancelled}}
+                {{#Open}}
+                <span class="label label-primary">O</span>
+                {{/Open}}
+                &nbsp;&nbsp;
+                <strong>{{project_name}}</strong>
+                &nbsp;&nbsp;
+                <span>{{days}} days old</span>, 
+                <span>{{net_units}} units</span>
+                {{#prediction}},&nbsp;
+                <span><b>{{prediction}}</b> chance of success</span>
+                {{/prediction}}
+            </a>
+        </div>
+    </div>
+    <div class="row model-preview-row hidden">
+    </div>
+</li>
+{{/collection}}

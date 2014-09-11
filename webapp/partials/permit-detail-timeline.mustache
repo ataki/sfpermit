@@ -1,21 +1,14 @@
-<div class="timeline-img">
-    {{#edit}}
-    <img src="images/icons/edit" /> 
-    {{/edit}}
-    {{#note}}
-    <img src="images/icons/note" /> 
-    {{/note}}
-    {{#closed}}
-    <img src="images/icons/closed" /> 
-    {{/closed}}
-    {{#opened}}
-    <img src="images/icons/opened" /> 
-    {{/opened}}
-    {{#created}}
-    <img src="images/icons/created" /> 
-    {{/created}}
-</div>
-<div class="timeline-content">
-    <h4>{{text}}</h4>
-    <h6 class="aside">{{timestamp_dt}}</h6>
+<div class="timeline-block">
+    <div class="timeline-timestamp">
+        <div class="text-aside timeline-timestamp-date">{{ timestamp_dp }}</div>
+        {{#decision}}
+        <div class="timeline-circle primary"></div>
+        {{/decision}}
+        {{^decision}}
+        <div class="timeline-circle default"></div>
+        {{/decision}}
+    </div>
+    <div class="timeline-content">
+        <p><strong>{{ type }}</strong> {{ text }}</p>
+    </div>
 </div>
