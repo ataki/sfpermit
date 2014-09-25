@@ -3,11 +3,11 @@
 ####################
 import os
 
-DEBUG = False
+DEBUG = True
 SECRET_KEY = '1234' # make sure to change this
 
-# SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://localhost:''@localhost/bayesimpact'
-SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://localhost:''@localhost/bayesimpact'
+# SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 
 LESS_CONFIG = {
   "SRC": "static/less",

@@ -104,8 +104,7 @@ def upload_permit():
         db.session.commit()
         flash("Permit created")
         return redirect(url_for("index"))
-    else:
-        abort(404)
+    return render_template("upload_permit.html", form=form)
 
 
 def distanceGenerator(lat, lng):
