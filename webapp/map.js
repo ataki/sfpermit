@@ -20,9 +20,9 @@ define(function(require) {
 
     // leaflet map
     var map = L.map('map', {'zoomControl': false});
-    window._map_ = map;
     var markerCluster = new L.MarkerClusterGroup();
     var markerIds = {};
+    window._map = map;
 
     // update current address when necessary
     var currentAddress = Store.CurrentAddress;
@@ -121,6 +121,7 @@ define(function(require) {
     });
 
     Backbone.on("map.setView", function(address, d) {
+        console.log("panning to ", address.toMapView());
         var addr = address.toMapView();
         map.panTo(addr);
         map.setZoom(address.get("zoom") || config.DEFAULT_MAP_ZOOM);
@@ -143,21 +144,14 @@ define(function(require) {
     
     // initial setup for controls 
     function setup(options) {
-        // allow custom keys in setup to override config keys
         var key = options.key || config.APIKEY
             , mapId = options.mapId
-            , data = options.data;
+            , data = options.data
+            , initialView = options.initialView;
 
-        if (currentAddress.get("latitude") != 0 && currentAddress.get("longitude") != 0) {
-            var initialView = currentAddress.toMapView();
-            map.setView(initialView, 11);
-        } else {
-            // create "global" map
-            currentAddress.once("change", function(address) {
-                var initialView = currentAddress.toMapView();
-                map.setView(initialView, 11);
-            });
-        }
+        console.log("initialView: ", initialView);
+        CurrentAddress.setCoordinates(initialView);
+        map.setView(initialView, 11);
 
         // Disable scrolling to allow for scrolling on panels
         map.scrollWheelZoom.disable();

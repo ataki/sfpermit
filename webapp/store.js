@@ -96,6 +96,12 @@ define(function(require) {
         },
         toMapView: function() {
             return [this.get("latitude"), this.get("longitude")];
+        },
+        setCoordinates: function(pt_arr) {
+            this.set({
+                'latitude': pt_arr[0],
+                'longitude': pt_arr[1]
+            })
         }
     });
 
@@ -283,7 +289,7 @@ define(function(require) {
                 throw "Metric must be distance|units|risk"
             }
         }
-    })
+    });
 
     var Log = Backbone.Model.extend({
         url: function() {
@@ -354,11 +360,13 @@ define(function(require) {
     });
 
     // current address singletons
+    // not correct if you're not exploring in SF,
+    // so disabling this setter for now
     function constructCurrentAddress(position) {
-        CurrentAddressSingleton.set({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-        });
+        // CurrentAddressSingleton.set({
+        //     latitude: position.coords.latitude,
+        //     longitude: position.coords.longitude
+        // });
     }
     function constructDefaultCurrentAddress() {
        alert("The application can't seem to find your current location. Without it, we cannot start"); 
@@ -382,6 +390,8 @@ define(function(require) {
     var permitCollection = new PermitCollection();
     permitCollection.fetch();
 
+    // Persistent data. Use these structures 
+    // as read-only ones for reference
     var DB = {
         permits: permitCollection
     };

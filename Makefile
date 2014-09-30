@@ -6,7 +6,7 @@ db:
 	@echo "##########################"
 	@echo "Done creating db"
 
-serve:
+server:
 	@echo "Start test server..."
 	@./run.py server
 
@@ -16,7 +16,7 @@ assets:
 	@echo "##########################"
 	@echo "Done. Output in webapp/dist/app.build.js"
 
-dev:
+devstack:
 	@echo "Recompile CSS dynamically..."
 	@node webapp/lesswatcher.js
 

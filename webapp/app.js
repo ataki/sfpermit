@@ -33,6 +33,10 @@ requirejs.config({
 			exports: 'Backbone'
 		},
 
+        bootstrap: {
+            deps: ['jquery']
+        },
+
         typeahead: {
             deps: ['jquery']
         }
@@ -48,7 +52,11 @@ require([
 	'map', 
     'bootstrap',
 ], function($, _, config, Router, Store, Map) {
-    // launches app at right time
+
+    window.debug = window.debug || {};
+
+    // launches the app using a cascading series
+    // of initialization functinos.
     // Nothing interesting here; the setup comes in 
     // map.js and then master-control.js
 
@@ -57,13 +65,9 @@ require([
 
     function initializeAppAndMap() {
         console.log("Fetched nearest permits");
-        permits.off("sync");
+        permits.off("sync", initializeAppAndMap);
 
-        var permit = permits.first();
-        var initialView = [
-            permit.get("latitude"), 
-            permit.get("longitude")
-        ];
+        var initialView = [37.7749, -122.419];
 
         Map.setup({
             'key': config.APIKEY, 
@@ -73,7 +77,6 @@ require([
         });
 
         var router = new Router(); 
-        window.router = router;
         Backbone.history.start();
         router.navigate("permits/p1", {trigger: true});
     }
@@ -83,12 +86,12 @@ require([
         console.log("Initializing data");
         var options = {
             data: {
-                limit: 30, 
-                lat: currentAddress.get("latitude"),
-                lng: currentAddress.get("longitude")
+                limit: 30
             }
         };
 
+        // check if permits have already been
+        // fetched. If not, fetch it
         if (permits.length == 0) {
             permits.on("sync", initializeAppAndMap);
             permits.fetch(options);
@@ -97,7 +100,16 @@ require([
         }
     }
 
+
+    function bindStyles() {
+        // Bootstrap-like style initialization
+        $('[data-toggle="tooltip"]').tooltip({placement: 'left'});
+    }
+
+
     function launch() {
+        bindStyles();
+
         if (currentAddress.validate()) {
             initializeData();
         } else {
@@ -105,7 +117,6 @@ require([
         }
     }
 
-    $('[data-toggle="tooltip"]').tooltip({placement: 'left'});
 
     $(document).ready(launch);
 })
