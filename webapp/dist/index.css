@@ -225,6 +225,9 @@ textarea {
 .model-preview-row {
   margin-top: 10px;
 }
+#manager table {
+  font-size: 12px;
+}
 /* Map Container */
 #map {
   position: fixed;
@@ -475,19 +478,23 @@ textarea {
 }
 .global-alert {
   position: fixed;
-  bottom: 0;
-  width: 140px;
-  height: 50px;
-  left: 50%;
+  margin: auto;
+  top: -10px;
+  right: 50%;
+  margin-right: -90px;
+  height: 60px;
+  line-height: 55px;
   z-index: 9999;
-  padding: 7px 10px;
-  background-color: #fff233;
-  font-size: 12px;
+  padding: 7px 45px;
+  background-color: #f74f44;
+  color: #FFF;
+  font-size: 16px;
   font-weight: 700;
   text-align: center;
   -webkit-box-shadow: 1px 2px 5px #eeeeee;
   -moz-box-shadow: 1px 2px 5px #eeeeee;
   box-shadow: 1px 2px 5px #eeeeee;
+  border-radius: 5px;
 }
 /*!
  *  Font Awesome 4.0.3 by @davegandy - http://fontawesome.io - @fontawesome
@@ -1831,11 +1838,12 @@ textarea {
   padding: 10px 0;
 }
 .timeline {
+  /* container */
   position: relative;
   padding: 2em 0;
   margin-top: 2em;
   margin-bottom: 2em;
-  padding-left: 75px;
+  padding-left: 125px;
   overflow: scroll;
 }
 .timeline::before {
@@ -1843,7 +1851,7 @@ textarea {
   content: '';
   position: absolute;
   top: 0;
-  left: 150px;
+  left: 125px;
   height: 100%;
   width: 4px;
   background: #d7e4ed;
@@ -1852,7 +1860,7 @@ textarea {
   width: 24px;
   height: 24px;
   border-radius: 24px;
-  margin-left: 65px;
+  margin-left: -9px;
   z-index: 900;
 }
 .timeline-circle.default {
@@ -1864,7 +1872,7 @@ textarea {
   background-color: #d7e4ed;
 }
 .timeline-content {
-  margin-left: 125px;
+  margin-left: 41.66666667px;
   margin-bottom: 30px;
 }
 .timeline-timestamp {
