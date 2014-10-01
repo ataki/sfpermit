@@ -25,10 +25,14 @@ define(function(require) {
 			this.$el.html(this.template());
 			this.$el.hide();
 			this.$el.prependTo('body');
+            this._offed = false;
 		},
 		setMessage: function(msg) {
 			this.$('.message').text(msg);
 		},
+        setHTML: function(html) {
+            this.$('.message').html(html);
+        },
 		off: function() {
 			this.$el.hide();
 		},
@@ -39,10 +43,15 @@ define(function(require) {
 			var _ref = this;
 			setTimeout(function() {
 				_ref.off();
-			}, seconds * 1000)
+                _ref.destroy();
+			}, seconds * 1000);
+            this.$el.show();
 		},
 		destroy: function() {
-			this.remove();
+            if (!this._offed) {
+                this._offed = true;
+                this.remove();
+            }
 		}
 	}) 
 

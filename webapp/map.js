@@ -47,11 +47,6 @@ define(function(require) {
                     var addr = permit.getAddress();
                     var json = permit.toJSON();
                     var html = Mustache.render(template, json);
-                    // var marker = L.Marker(addr, {
-                    //         color: permit.getColor()
-                    //     })
-                    //     .setRadius(permit.getNetUnitRadius())
-                    //     .bindPopup(html);
                     var marker = new L.circleMarker(addr, {
                         color: permit.getColor()
                     });

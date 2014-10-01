@@ -17,6 +17,9 @@ import math
 import calendar
 import datetime
 
+from geopy.geocoders import GoogleV3
+geolocator = GoogleV3()
+
 # routing for API endpoints (generated from the models designated as API_MODELS)
 from backend.core import api_manager
 from backend.models import *
@@ -104,11 +107,35 @@ def upload_permit():
     # form.min_filed.data = datetime.datetime.strptime(form.min_filed._value(), "%m/%d/%Y")
     # form.max_action.data = datetime.datetime.strptime(form.min_filed._value(), "%m/%d/%Y")
     # form.case_decision_date.data = datetime.datetime.strptime(form.min_filed._value(), "%m/%d/%Y")
-    print form.max_action._value()
-    print form.case_decision_date._value()
     if request.method == "POST" and form.validate():
         permit = Permit()
         form.populate_obj(permit)
+        # Usually this is manually assigned, however I'm guessing model_forms doesn't
+        # support polymorphic types. sqlalchemy is also partly to blame as they don't 
+        # assign this post-saving the model.
+        permit.type = 'permit'
+
+        if permit.address is None or len(permit.address) == 0:
+            try:
+                address, (lat, lng) = geolocator.geocode(permit.project_name + " San Francisco")
+                permit.address = address
+                permit.latitude = lat
+                permit.longitude = lng
+            except:
+                flash("Permit created, but couldn't translate project name to an address")
+                permit.latitude = None
+                permit.longitude = None
+                permit.address = None
+        else:
+            try:
+                _un, (lat, lng) = geolocator.geocode(permit.address + " San Francisco")
+                permit.latitude = lat
+                permit.longitude = lng
+            except:
+                flash("Permit created, but address not found")
+                permit.latitude = None
+                permit.longitude = None
+
         db.session.add(permit)
         db.session.commit()
         flash("Permit created")
@@ -118,7 +145,7 @@ def upload_permit():
         required_fields=['case_number', 'project_name', 'final_status',
             'case_decision_date', 'net_units'],
         omit_fields=['e', 'c', 'v', 'x', 'd', 'a', 'r', 
-            'longitude', 'latitude', 'prediction', 'address', 'type'])
+            'longitude', 'latitude', 'prediction', 'type'])
 
 
 @app.route("/manage", methods=['GET'])

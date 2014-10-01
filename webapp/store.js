@@ -156,8 +156,8 @@ define(function(require) {
 
     var Permit = Backbone.Model.extend({
         validate: function() {
-            return !isNaN(this.get("latitude")) && 
-                    !isNaN(this.get("longitude"));
+            return !_.isNaN(this.get("latitude")) && !_.isNaN(this.get("longitude")) && 
+                    !_.isNull(this.get("latitude")) && !_.isNull(this.get("longitude"));
         },
         getAddress: function() {
             return [this.get("latitude"), this.get("longitude")];

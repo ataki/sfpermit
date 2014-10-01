@@ -6,6 +6,7 @@ define(function(require) {
     var Templates = require("templates");
     var Store = require("store");
     var Forms = require("utils/forms");
+    var AlertView = require("utils/global-alert")
 
     require("typeahead");
 
@@ -87,11 +88,18 @@ define(function(require) {
 
             // typeahead interaction
             $("#permit-search").on("typeahead:selected", function(evt, d) {
-                var addr = new Address({
-                    latitude: d.latitude,
-                    longitude: d.longitude
-                })
-                Backbone.trigger("map.setView", addr, d); 
+                if (_.isNumber(d.latitude) && _.isNumber(d.longitude)) {
+                    var addr = new Address({
+                        latitude: d.latitude,
+                        longitude: d.longitude
+                    })
+                    Backbone.trigger("map.setView", addr, d); 
+                } else {
+                    var alert = new AlertView(); // renders itself into the global window
+                    alert.setHTML("That permit is misconfigured. Edit it " + 
+                        "<a href=\"/edit/" + d.id + "\" ref=\"blank\">here</a>");
+                    alert.showTransient(5);
+                }
             });
         },
         updateCurrentAddress: function(lat, lng) {
