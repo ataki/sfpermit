@@ -181,7 +181,7 @@ class PermitUpdateLog(db.Model):
                                "note",      # online comment
                                "decision",  # court decision
                                "action",    # court action
-                               "created"]))
+                               "created"], name='log_type'))
 
     def __repr__(self):
         return "<Log for permit %d>: %s" % (self.permit_id, self.text)
