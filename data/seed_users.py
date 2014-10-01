@@ -6,6 +6,6 @@ with app.app_context():
         username="bayesimpact", 
         email="admin@bayesimpact.org", 
         password=encrypt_password("koala.bear.duo"),
-        active=True
+        active=1
     )
     db.session.commit()

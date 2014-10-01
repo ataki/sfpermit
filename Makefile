@@ -19,7 +19,7 @@ server:
 
 assets:
 	@echo "Optimizing with r.js..."
-	@cd webapp && r.js -o build.js
+	@cd webapp && r.js -o build.js && r.js -o build.manage.js && r.js -o build.upload.js
 	@echo "##########################"
 	@echo "Done. Output in webapp/dist/app.build.js"
 
