@@ -3,7 +3,7 @@
     name: "bower_components/almond/almond.js",
     include: ['manage'],
     insertRequire: ['manage'],
-    out: "dist/app.manager.build.js",
+    out: "dist/app.manage.build.js",
     wrap: true,
     paths: {
         config: 'config',
