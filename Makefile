@@ -4,7 +4,7 @@ db:
 	@python -m data.import
 	@echo "Pulling geolocations for permits"
 	python -m data.pull_geolocations
-	@echo "Creating initial logs
+	@echo "Creating initial logs"
 	python -m data.create_initial_logs
 	@echo "Seeding comments"
 	python -m data.seed_comments
