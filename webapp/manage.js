@@ -12,7 +12,11 @@ requirejs.config({
         bootstrap: 'bower_components/bootstrap/dist/js/bootstrap.min',
         leaflet: 'bower_components/leaflet/dist/leaflet',
         leaflet_markercluster: 'bower_components/leaflet.markercluster/dist/leaflet.markercluster-src',
-        typeahead: 'bower_components/typeahead.js/dist/typeahead.bundle.min' 
+        typeahead: 'bower_components/typeahead.js/dist/typeahead.bundle.min',
+        backgrid: 'bower_components/backgrid/lib/backgrid',
+        'backgrid-paginator': 'bower_components/backgrid-paginator/backgrid-paginator',
+        'backgrid-filter': 'bower_components/backgrid-filter/backgrid-filter',
+        'backbone-pageable': 'bower_components/backbone-pageable/lib/backbone-pageable'
     },
 
     shim: {
@@ -39,84 +43,54 @@ requirejs.config({
 
         typeahead: {
             deps: ['jquery']
+        },
+
+        backgrid: {
+            deps: ['jquery', 'backbone', 'underscore'],
+            exports: 'Backgrid'
+        },
+
+        'backgrid-paginator': {
+            deps: ['backgrid']
+        },
+
+        'backgrid-filter': {
+            deps: ['backgrid']
         }
     }
 })
 
 require([
     'jquery', 
-    'underscore', 
     'config',
-    'router',
     'store',
-    'map', 
+    'views/manager-view',
     'bootstrap',
-], function($, _, config, Router, Store, Map) {
+], function($, config, Store, Manager) {
 
-    window.debug = window.debug || {};
+    var permits = Store.DB.permits; 
 
-    // launches the app using a cascading series
-    // of initialization functinos.
-    // Nothing interesting here; the setup comes in 
-    // map.js and then master-control.js
-
-    var currentAddress = Store.CurrentAddress;
-    var permits = Store.DB.permits;
-
-    function initializeAppAndMap() {
-        console.log("Fetched nearest permits");
-        permits.off("sync", initializeAppAndMap);
-
-        var initialView = [37.7749, -122.419];
-
-        Map.setup({
-            'key': config.APIKEY, 
-            'mapId': config.MAPBOX_MAP_ID,
-            'initialView': initialView,
-            'data': permits.toJSON()
+    function initialize() {
+        var SFPermitManager = new Manager({
+            el: '#manager'
         });
-
-        var router = new Router(); 
-        Backbone.history.start();
-        router.navigate("permits/p1", {trigger: true});
+        SFPermitManager.render();
     }
 
-
-    function initializeData() {
-        console.log("Initializing data");
-        var options = {
-            data: {
-                limit: 30
-            }
-        };
-
+    function maybeFetchPermits() {
         // check if permits have already been
         // fetched. If not, fetch it
         if (permits.length == 0) {
-            permits.on("sync", initializeAppAndMap);
-            permits.fetch(options);
+            permits.on("sync", initialize);
+            permits.fetch({reset: true});
         } else {
-            initializeAppAndMap();
+            initialize();
         }
     }
 
+    $(document).ready(function() {
+        console.log("Initializing data");
+        maybeFetchPermits(); 
+    });
 
-    function bindStyles() {
-        // Bootstrap-like style initialization
-        $('[data-toggle="tooltip"]').tooltip({placement: 'left'});
-    }
-
-
-    function launch() {
-        bindStyles();
-
-        if (currentAddress.validate()) {
-            initializeData();
-        } else {
-            currentAddress.on("set change", initializeData);
-        }
-    }
-
-
-    $(document).ready(launch);
 })

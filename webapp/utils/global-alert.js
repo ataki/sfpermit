@@ -9,8 +9,8 @@ define(function(require) {
 	 *  alert.showTransient(seconds); // persistents until time indicated	
 	 *  alert.off(); // empties and hides global alert 
 	 *  alert.setMessage("New Message");
-   *  ..etc...
-    * alert.destroy(); // when you're finished, remove 
+     *  ..etc...
+     * alert.destroy(); // when you're finished, remove 
 	 */
 
 	var Backbone = require("backbone");
@@ -42,8 +42,10 @@ define(function(require) {
 		showTransient: function(seconds) {
 			var _ref = this;
 			setTimeout(function() {
-				_ref.off();
-                _ref.destroy();
+                _ref.$el.fadeOut(1000, function() {
+                    _ref.off();
+                    _ref.destroy();
+                });
 			}, seconds * 1000);
             this.$el.show();
 		},

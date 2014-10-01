@@ -1,9 +1,11 @@
 from backend.models import *
+from flask_security.utils import encrypt_password
 
-u1 = User(
-    username="bayesimpact", 
-    email="admin@bayesimpact.org", 
-    password="koala.bear.duo",
-    active=True)
-db.session.add(u1)
-db.session.commit()
+with app.app_context():
+    u1 = user_datastore.create_user(
+        username="bayesimpact", 
+        email="admin@bayesimpact.org", 
+        password=encrypt_password("koala.bear.duo"),
+        active=True
+    )
+    db.session.commit()

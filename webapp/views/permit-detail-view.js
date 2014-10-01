@@ -10,6 +10,8 @@ define(function(require) {
     var Comment = Store.Comment;
     var Log = Store.Log;
 
+    var AlertView = require("utils/global-alert");
+
     var formatDatetimeWSeconds = Store.formatDatetimeWSeconds;
 
     var CommentView = Backbone.View.extend({
@@ -50,27 +52,39 @@ define(function(require) {
                 timestamp: new Date(),
             });
             var errors;
+            var _ref = this;
             if (!(errors = comment.validate())) {
-                comment.save();
-                // TODO Only clear textarea if we
-                // save the signal. Gives users a
-                // chance to save their comments
-                this.$(".permit-form form textarea").val('');
+                comment.save(null, {
+                    success: function() {
+                        _ref.addToCollection(comment, formData)
+                    },
+                    error: function() {
+                        var alert = new AlertView();
+                        alert.setMessage("Must be logged in");
+                        alert.showTransient(2);
+                    }
+                });
+            }
+        },
+        addToCollection: function(comment, formData) {
+            // TODO Only clear textarea if we
+            // save the signal. Gives users a
+            // chance to save their comments
+            this.$(".permit-form form textarea").val('');
 
-                this.collection.add(comment);
-                this.collection.sort();
+            this.collection.add(comment);
+            this.collection.sort();
 
-                // Post data to timeline if necessary
-                if (_.has(formData, "postToTimeline")) {
-                    var log = new Log({
-                        permit_id: this.model.id,
-                        type: "note",
-                        text: formData.text.substring(0, 125),
-                        timestamp: new Date()
-                    });
-                    log.save();
-                    this.logs.add(log);
-                }
+            // Post data to timeline if necessary
+            if (_.has(formData, "postToTimeline")) {
+                var log = new Log({
+                    permit_id: this.model.id,
+                    type: "note",
+                    text: formData.text.substring(0, 125),
+                    timestamp: new Date()
+                });
+                log.save();
+                this.logs.add(log);
             }
         },
         renderComment: function(m) {
