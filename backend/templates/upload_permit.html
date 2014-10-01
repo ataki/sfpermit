@@ -3,19 +3,21 @@
       <link href='https://fonts.googleapis.com/css?family=Open+Sans:700,400,300' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="/bower_components/leaflet/dist/leaflet.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/bower_components/bootstrap-datepicker/css/datepicker.css">
     <link rel="stylesheet" href="/index.css" type="text/css" />
+    <script data-main="upload" src="bower_components/requirejs/require.js"></script>
   </head>
   <body>
     {% from "_formhelpers.html" import render %}
-    <div class="container edit-permit-form-container">
-      <h2>Permit {{ model.project_name }}</h2>
+    <div class="container upload-permit-form-container">
+      <h2>Permit</h2>
       <p>
-        When done editing, remember to save your changes by pressing 
-        the "Save" button below
+        When done editing, save the permit using the "Save" button below.<br/>
+        Not all fields have to be filled, but required ones are marked with "*Required".
       </p>
       <hr/>
       <form class="form-horizontal edit-permit-form" method="post" action="/upload">
-        {{ render(form) }}
+        {{ render(form, required_fields=required_fields, omit_fields=omit_fields) }}
         <br/>
         <button type="submit" class="btn btn-danger">Save Permit</button>
         <button type="button" class="btn">Cancel</button>

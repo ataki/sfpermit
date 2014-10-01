@@ -19,6 +19,10 @@ define(function(require) {
 
     var endpoint = Store.endpoint;
 
+    function extractValue(d) {
+        return d.project_name + " (" + d.case_number + ")";
+    }
+
     var Header = Backbone.View.extend({
         id: 'menu-control',
         events: {
@@ -55,7 +59,7 @@ define(function(require) {
                         var objects = response.objects;
                         return _.map(objects, function(d) {
                             return {
-                                'value': d.project_name,
+                                'value': extractValue ? extractValue(d) : d.project_name, 
                                 'id': d.id,
                                 'latitude': d.latitude,
                                 'longitude': d.longitude

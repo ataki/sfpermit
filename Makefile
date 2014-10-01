@@ -8,6 +8,8 @@ db:
 	python -m data.create_initial_logs
 	@echo "Seeding comments"
 	python -m data.seed_comments
+	@echo "Seeding superusers"
+	python -m data.seed_users
 	@echo "##########################"
 	@echo "Done creating db"
 

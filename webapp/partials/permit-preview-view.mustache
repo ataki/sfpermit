@@ -3,6 +3,20 @@
     <a href="#permit/{{id}}" class="btn btn-xs">View permit page</a>
 </div>
 <div class="col-sm-5 col-md-8">
+    {{#Open}}
+    <div class="row">
+        <div class="col-sm-12 col-md-12">
+            <h2>{{prediction}} %</h2>
+            <h6 class="text-aside">chance of approval</h6>
+        </div>
+    </div>
+    {{/Open}}
+    {{^Open}}
+    <div>
+    This property is currently <b>{{final_status}}</b>
+    </div>
+    {{/Open}}
+    
     <h5 class="titular" data-toggle="tooltip" title="Unique Planning ID assigned to each case">
         Case number <b>{{case_number}}</b>
     </h5>
@@ -18,23 +32,9 @@
     <h5 class="titular" data-toggle="tooltip" title="Whether or not the case was ultimately approved by planning (this is the key field used to determine a complete case for the past performance analysis)">
         Planning Approved? <b>{{planning_approved}}</b>
     </h5>
-    
-    {{#Open}}
-    <div class="row">
-        <div class="col-sm-6 col-md-6">
-            <h2>{{prediction}}</h2>
-            <h6 class="text-aside">chance of approval</h6>
-        </div>
-        <div class="col-ms-6 col-md-6">
-            {{#case_decision_date}}
-            This case's decision date is {{case_decision_date}}
-            {{/case_decision_date}}
-        </div>
-    </div>
-    {{/Open}}
-    {{^Open}}
-    <div>
-    This property is currently <b>{{final_status}}</b>
-    </div>
-    {{/Open}}
+    {{#case_decision_date}}
+    <h5 class="titular" data-toggle="tooltip" title="Case decision date on record, this is a single data across all case records that should indicate when a final decision was made. This is used as reference, but cannot be trusted, instead the max action date is used to indicate the final decision">
+        Case Decision Date <b>{{case_decision_date}}</b>
+    </h5>
+    {{/case_decision_date}}
 </div>

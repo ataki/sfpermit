@@ -40,7 +40,11 @@ for model_name in app.config['API_MODELS']:
 session = api_manager.session
 
 # Model forms for routes
-PermitForm = model_form(Permit, Form)
+PermitForm = model_form(Permit, Form, field_args={
+    'min_filed': {'format': "%m/%d/%Y"},
+    'max_action': {'format': "%m/%d/%Y"},
+    'case_decision_date': {'format': "%m/%d/%Y"}
+})
 # StagedPermitForm = model_form(StagedPermit, Form)
 
 
@@ -75,7 +79,7 @@ def geocode_api():
 
 
 @app.route('/')
-def basic_pages():
+def index():
     return render_template('index.html')
 
 
@@ -96,7 +100,12 @@ def edit_permit(permit_id):
 @app.route("/upload", methods=['GET', 'POST'])
 @login_required
 def upload_permit():
-    form = PermitForm(request.POST)
+    form = PermitForm(request.form)
+    # form.min_filed.data = datetime.datetime.strptime(form.min_filed._value(), "%m/%d/%Y")
+    # form.max_action.data = datetime.datetime.strptime(form.min_filed._value(), "%m/%d/%Y")
+    # form.case_decision_date.data = datetime.datetime.strptime(form.min_filed._value(), "%m/%d/%Y")
+    print form.max_action._value()
+    print form.case_decision_date._value()
     if request.method == "POST" and form.validate():
         permit = Permit()
         form.populate_obj(permit)
@@ -104,7 +113,18 @@ def upload_permit():
         db.session.commit()
         flash("Permit created")
         return redirect(url_for("index"))
-    return render_template("upload_permit.html", form=form)
+
+    return render_template("upload_permit.html", form=form, 
+        required_fields=['case_number', 'project_name', 'final_status',
+            'case_decision_date', 'net_units'],
+        omit_fields=['e', 'c', 'v', 'x', 'd', 'a', 'r', 
+            'longitude', 'latitude', 'prediction', 'address', 'type'])
+
+
+@app.route("/manage", methods=['GET'])
+@login_required
+def manage_permits():
+    return render_template("manage_permits.html")
 
 
 def distanceGenerator(lat, lng):

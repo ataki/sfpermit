@@ -120,6 +120,16 @@ define(function(require) {
         enableMapInteractions();
     });
 
+    function tryGoingToMarker(marker) {
+        try {
+            markerCluster.zoomToShowLayer(marker, function() {
+                console.log("zoomToShowLayer works");
+            });
+        } catch (err) {
+            // pass 
+        }
+    }
+
     Backbone.on("map.setView", function(address, d) {
         console.log("panning to ", address.toMapView());
         var addr = address.toMapView();
@@ -137,7 +147,7 @@ define(function(require) {
                     maybeMarker.openPopup();
                 }
             } catch (err) {
-                markerCluster.zoomToShowLayer(maybeMarker);
+                tryGoingToMarker(maybeMarker);
             }
         }
     });

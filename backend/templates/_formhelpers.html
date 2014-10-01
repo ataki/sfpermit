@@ -1,15 +1,22 @@
-{% macro render(form) %}
+{% macro render(form, omit_fields=[], required_fields=[]) %}
   {% for field in form if field.type not in ["HiddenField", "CSRFTokenField"] %}
+    {% if field.name not in omit_fields %}
+
 <div class="form-group {% if field.errors %}has-error{% endif %}">
     <label class="control-label col-sm-2">{{ field.label }}</label>
     <div class="col-sm-10">
-      {{ field(class_="form-control")}}
-    </div>
+      {{ field(class_="form-control input-sm " + field.short_name)}}
       {% if field.errors %}
         {% for error in field.errors %}
           <span class="help-block">{{error}}</span>
         {% endfor %}
       {% endif %}
+      {% if field.name in required_fields %}
+        <span class="help-block warning"><strong>* Required</strong></span>
+      {% endif %}
+    </div>
 </div>
+
+    {% endif %}
   {% endfor %}
 {% endmacro %}

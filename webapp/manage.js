@@ -1,37 +1,37 @@
 requirejs.config({
 
-	baseUrl: "",
+    baseUrl: "",
 
-	paths: {
-		config: 'config',
-		jquery: 'bower_components/jquery/dist/jquery.min',
-		backbone: 'bower_components/backbone/backbone',
-		underscore: 'bower_components/underscore/underscore',
-		mustache: 'bower_components/mustache/mustache',
+    paths: {
+        config: 'config',
+        jquery: 'bower_components/jquery/dist/jquery.min',
+        backbone: 'bower_components/backbone/backbone',
+        underscore: 'bower_components/underscore/underscore',
+        mustache: 'bower_components/mustache/mustache',
         moment: 'bower_components/moment/min/moment.min',
         bootstrap: 'bower_components/bootstrap/dist/js/bootstrap.min',
-		leaflet: 'bower_components/leaflet/dist/leaflet',
+        leaflet: 'bower_components/leaflet/dist/leaflet',
         leaflet_markercluster: 'bower_components/leaflet.markercluster/dist/leaflet.markercluster-src',
         typeahead: 'bower_components/typeahead.js/dist/typeahead.bundle.min' 
-	},
+    },
 
-	shim: {
-		underscore: {
-			exports: '_'
-		},
+    shim: {
+        underscore: {
+            exports: '_'
+        },
 
-		leaflet: {
-			exports: 'L'
-		},
+        leaflet: {
+            exports: 'L'
+        },
 
         leaflet_markercluster: {
             deps: ['leaflet']
         },
 
-		backbone: {
-			deps: ['jquery', 'underscore'],
-			exports: 'Backbone'
-		},
+        backbone: {
+            deps: ['jquery', 'underscore'],
+            exports: 'Backbone'
+        },
 
         bootstrap: {
             deps: ['jquery']
@@ -40,16 +40,16 @@ requirejs.config({
         typeahead: {
             deps: ['jquery']
         }
-	}
+    }
 })
 
 require([
-	'jquery', 
-	'underscore', 
-	'config',
+    'jquery', 
+    'underscore', 
+    'config',
     'router',
     'store',
-	'map', 
+    'map', 
     'bootstrap',
 ], function($, _, config, Router, Store, Map) {
 
