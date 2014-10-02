@@ -186,15 +186,13 @@ define(function(require) {
         },
         getPredictionLevel: function() {
             var level = this.get("prediction");
-            if (level > 0.6) {
+            if (level > 0.65) {
                 return "success";
             }
-            else if (level > 0.3) {
-                return "warning";
+            if (level > 0.3) {
+                return "default";
             }
-            else {
-                return "danger";
-            }
+            return "danger";
         },
         getDaysLevel: function() {
             var days = this.get("days");
