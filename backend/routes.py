@@ -23,9 +23,15 @@ geolocator = GoogleV3()
 # routing for API endpoints (generated from the models designated as API_MODELS)
 from backend.core import api_manager
 from backend.models import *
+from backend.engine import init as retrain
 
 from geopy.geocoders import GoogleV3
 geolocator = GoogleV3()
+
+from rq import Queue
+from worker import conn
+
+q = Queue(connection=conn)
 
 # Api for models
 default_model_config = {
@@ -139,6 +145,7 @@ def upload_permit():
         db.session.add(permit)
         db.session.commit()
         flash("Permit created")
+        q.enqueue(retrain)
         return redirect(url_for("index"))
 
     return render_template("upload_permit.html", form=form, 

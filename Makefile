@@ -4,6 +4,8 @@ db:
 	@python -m data.import
 	@echo "Pulling geolocations for permits"
 	python -m data.pull_geolocations
+	@echo "Making predictions"
+	python -m data.make_predictions
 	@echo "Creating initial logs"
 	python -m data.create_initial_logs
 	@echo "Seeding comments"
@@ -22,6 +24,12 @@ assets:
 	@cd webapp && r.js -o build.js && r.js -o build.manage.js && r.js -o build.upload.js
 	@echo "##########################"
 	@echo "Done. Output in webapp/dist/app.build.js"
+
+manager:
+	@echo "Optimizing with r.js..."
+	@cd webapp && r.js -o build.manage.js && r.js
+	@echo "##########################"
+	@echo "Done. Output in webapp/dist/app.manage.build.js"
 
 devstack:
 	@echo "Recompile CSS dynamically..."

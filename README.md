@@ -60,3 +60,11 @@ Run
 	node webapp/lesswatcher.js
 
 to create the CSS files and watch for LESS changes.
+
+## Deploying
+
+When deploying to Heroku, check the following:
+
+- necessary css assets are in webapp/dist
+- necessary built js assets are in webapp/dist
+- config.py is configured to use Heroku settings

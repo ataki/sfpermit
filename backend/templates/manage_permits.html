@@ -1,20 +1,11 @@
 <html>
   <head>
-    {% if config.DEBUG %}
     <link rel="stylesheet" type="text/css" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="index.css" type="text/css" />
     <link rel="stylesheet" href="bower_components/backgrid/lib/backgrid.css" type="text/css" />
     <link rel="stylesheet" href="bower_components/backgrid-filter/backgrid-filter.css" type="text/css" />
     <link rel="stylesheet" href="bower_components/backgrid-paginator/backgrid-paginator.css" type="text/css" />
     <script data-main="manage" src="bower_components/requirejs/require.js"></script>
-    {% else %}
-    <link rel="stylesheet" type="text/css" href="dist/bootstrap.min.css">
-    <link rel="stylesheet" href="dist/index.css" type="text/css" />
-    <link rel="stylesheet" href="dist/backgrid.css" type="text/css" />
-    <link rel="stylesheet" href="dist/backgrid-filter.css" type="text/css" />
-    <link rel="stylesheet" href="dist/backgrid-paginator.css" type="text/css" />
-    <script src="dist/app.manage.build.js"></script>
-    {% endif %}
   </head>
   <body>
     <div class="container">
