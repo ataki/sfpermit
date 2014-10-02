@@ -9057,8 +9057,6 @@ requirejs.config({
         mustache: 'bower_components/mustache/mustache',
         moment: 'bower_components/moment/min/moment.min',
         bootstrap: 'bower_components/bootstrap/dist/js/bootstrap.min',
-        leaflet: 'bower_components/leaflet/dist/leaflet',
-        leaflet_markercluster: 'bower_components/leaflet.markercluster/dist/leaflet.markercluster-src',
         typeahead: 'bower_components/typeahead.js/dist/typeahead.bundle.min',
         backgrid: 'bower_components/backgrid/lib/backgrid',
         'backgrid-paginator': 'bower_components/backgrid-paginator/backgrid-paginator',
@@ -9220,6 +9218,7 @@ require([
                 });
             },
             render: function() {
+                this.$el.html("");
                 this.$el.append(this.filter.render().el);
                 this.$el.append(this.paginator.render().el);
                 this.$el.append(this.grid.render().el);
