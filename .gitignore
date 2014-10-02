@@ -1,5 +1,4 @@
 venv
-webapp/bower_components
 webapp/node_modules
 sfpermit.sublime-*
 *.pyc
