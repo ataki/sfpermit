@@ -3711,6 +3711,7 @@ define('store',['require','jquery','underscore','backbone','config','moment'],fu
             );
             attributes.min_filed = moment(attributes.min_filed).format("MMMM Do YYYY");
             attributes.max_action = moment(attributes.max_action).format("MMMM Do YYYY");
+            attributes.case_decision_date = moment(attributes.case_decision_date).format("MMMM Do YYYY");
             attributes.planning_approved = attributes.planning_approved ? "False": "True"; 
             attributes.in_current_planning = attributes.in_current_planning ? "False": "True";
             attributes.prediction *= 100;
