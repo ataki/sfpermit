@@ -1,7 +1,11 @@
 <html>
   <head>
     <link rel="stylesheet" type="text/css" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
+    {% if config.DEBUG %}
     <link rel="stylesheet" href="index.css" type="text/css" />
+    {% else %}
+    <link rel="stylesheet" href="dist/index.css" type="text/css" />
+    {% endif %}
     <link rel="stylesheet" href="bower_components/backgrid/lib/backgrid.css" type="text/css" />
     <link rel="stylesheet" href="bower_components/backgrid-filter/backgrid-filter.css" type="text/css" />
     <link rel="stylesheet" href="bower_components/backgrid-paginator/backgrid-paginator.css" type="text/css" />
